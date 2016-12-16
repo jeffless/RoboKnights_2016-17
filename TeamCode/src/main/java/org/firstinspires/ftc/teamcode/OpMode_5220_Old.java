@@ -285,7 +285,7 @@ public abstract class OpMode_5220_Old extends LinearOpMode
 
     }
 
-    public void waitForStart () throws InterruptedException
+    public void waitForStart ()
     {
         phase = WAITING;
         super.waitForStart();

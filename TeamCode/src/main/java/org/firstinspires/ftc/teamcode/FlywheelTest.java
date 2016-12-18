@@ -56,18 +56,17 @@ public class FlywheelTest extends LinearOpMode
     protected DcMotor flywheelLeft;
     protected DcMotor flywheelRight;
 
-    private ElapsedTime runtime = new ElapsedTime();
-
     public void runOpMode ()
     {
-        /*flywheelLeft = hardwareMap.dcMotor.get("fl");
+        flywheelLeft = hardwareMap.dcMotor.get("fl");
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //flywheelLeft.setMaxSpeed();
+        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         flywheelRight = hardwareMap.dcMotor.get("fr");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //flywheelRight.setMaxSpeed();
+        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         try
         {
@@ -81,43 +80,10 @@ public class FlywheelTest extends LinearOpMode
         {
             flywheelLeft.setPower(.8);
             flywheelRight.setPower(.8);
-        } */
 
-        flywheelLeft = hardwareMap.dcMotor.get("fl");
-        flywheelRight = hardwareMap.dcMotor.get("fr");
-
-        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        try
-        {
-            waitForStart();
-        }
-
-        catch (Exception e)
-        {
-
-        }
-
-        flywheelLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        flywheelRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        runtime.reset();
-
-        flywheelLeft.setPower(1.0);
-        flywheelRight.setPower(1.0);
-        while(opModeIsActive() && (runtime.time() < 10))
-        {
-            telemetry.addData("Left Encoder", "%4.1f:  %d counts", runtime.time(), flywheelLeft.getCurrentPosition());
-            telemetry.addData("Right Encoder", "%4.1f:  %d counts", runtime.time(), flywheelRight.getCurrentPosition());
+            telemetry.addData("Left Encoder", flywheelLeft.getCurrentPosition());
+            telemetry.addData("Right Encoder", flywheelRight.getCurrentPosition());
             telemetry.update();
         }
-
-        flywheelLeft.setPower(0.0);
-        flywheelRight.setPower(0.0);
-
-        telemetry.addData("Left Encoder", "%5.0f Counts Per Second", (double)(flywheelLeft.getCurrentPosition()) / runtime.time());
-        telemetry.addData("Right Encoder", "%5.0f Counts Per Second", (double)(flywheelRight.getCurrentPosition()) / runtime.time());
-        telemetry.update();
-        while (opModeIsActive());
     }
 }

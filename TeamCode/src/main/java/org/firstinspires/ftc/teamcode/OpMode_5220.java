@@ -166,6 +166,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected DcMotor sweeperMotor;
     protected DcMotor sweeperMotor2;
     protected DcMotor liftMotor;
+    protected DcMotor flywheelLeft;
+    protected DcMotor flywheelRight;
 
     protected DcMotor[] driveMotors = new DcMotor[4];
     protected int[] driveMotorInitValues = new int[4];
@@ -231,22 +233,34 @@ public abstract class OpMode_5220 extends LinearOpMode
         driveMotors[2] = leftBackMotor;
         driveMotors[3] = rightBackMotor;
 
+        /*
         shooterMotor = hardwareMap.dcMotor.get("shooter");
         shooterMotor.setDirection(DcMotor.Direction.REVERSE);
-        sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
-        sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
         sweeperMotor2 = hardwareMap.dcMotor.get("sweeper2");
         sweeperMotor2.setDirection(DcMotor.Direction.FORWARD);
+         */
+
+        sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
+        sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
         liftMotor = hardwareMap.dcMotor.get("lift");
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
 
+        flywheelLeft = hardwareMap.dcMotor.get("fl");
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        flywheelRight = hardwareMap.dcMotor.get("fr");
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
        // swivelServo = hardwareMap.servo.get("sServo");
 
-        shooterTiltServo = hardwareMap.servo.get("trServo");
+        //shooterTiltServo = hardwareMap.servo.get("trServo");
         doorServo = hardwareMap.servo.get ("dServo");
         autoExtendServo = hardwareMap.servo.get("rpServo");
         liftTiltServo = hardwareMap.servo.get ("ltServo");
-
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
@@ -256,12 +270,10 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorDown.enableLed(true);
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         touchSensorFront = hardwareMap.touchSensor.get("tSensor");
-
     }
 
     public void initialize()
     {
-        //swivelServo.setPosition(SWIVEL_INIT);
         shooterInit = getEncoderValue(shooterMotor);
         setShooterPreset(currentShooterPreset);
         moveLiftTiltServo(LIFT_TILT_BACKWARDS);
@@ -285,7 +297,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         writeToLog ("Down: " + colorSensorDown.getI2cAddress());
         writeToLog("Front: " + colorSensorFront.getI2cAddress());
-
     }
 
     public void waitForStart ()

@@ -108,7 +108,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static double right = 0;
     protected static double theta = 0;
 
-
     //CONFIGURABLE CONSTANTS:
 
     protected static final boolean TIMER_ON = false; //ALWAYS KEEP THIS OFF UNTIL/UNLESS WE DECIDE TO USE IT AND FIX THE CODE FOR USING THE IN-CODE TIME LIMIT (in runConditions)
@@ -1411,6 +1410,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         return (getEncoderValue(shooterMotor) - shooterInit);
     }
 
+    /*
     public final void shoot ()
     {
         if (shooterState != SHOOTER_READY) return;
@@ -1422,14 +1422,16 @@ public abstract class OpMode_5220 extends LinearOpMode
             shooterTarget = ENCODER_COUNTS_PER_ROTATION_NR60;
             shooterChanged = false;
         }
-/*
+
+
+        //unused section
         else if (nMotorEncoder[shooter] >= (14400))
         {
             offset = nMotorEncoder[shooter] - target;
             nMotorEncoder[shooter] = 0;
             target = 2880 - offset;
         }
-*/
+
         else
         {
             shooterTarget += ENCODER_COUNTS_PER_ROTATION_NR60;
@@ -1454,8 +1456,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         sleep(50);
         shooterState = SHOOTER_READY;
         waitFullCycle();
-    }
 
+    }
 
 
     private final class ShootThread extends Thread
@@ -1465,6 +1467,7 @@ public abstract class OpMode_5220 extends LinearOpMode
             shoot();
         }
     }
+
     public final void shootMulti ()
     {
         new ShootThread().start();
@@ -1483,6 +1486,86 @@ public abstract class OpMode_5220 extends LinearOpMode
             sleep (1550);
             setSweeperPower(0);
             if (!isBallLoaded()) break;
+        }
+        shootingAll = false;
+    }
+
+    private final class ShootAllThread extends Thread
+    {
+        public void run ()
+        {
+            shootAll();
+        }
+    }
+    protected boolean shootingAll = false;
+    public final void shootAllMulti ()
+    {
+        shootingAll = true;
+        new ShootAllThread().start();
+    }
+    */
+
+    public final void shoot()
+    {
+        flywheelLeft.setPower(0.8);
+        flywheelRight.setPower(0.8);
+    }
+
+    private final class ShootThread implements Runnable
+    {
+        private Thread shooting;
+
+        public void startShooting()
+        {
+            shooting = new Thread(this);
+            shooting.start();
+        }
+
+        public void stopShooting()
+        {
+            shooting.interrupt();
+            shooting = null;
+        }
+
+        public void run ()
+        {
+            while(!Thread.currentThread().isInterrupted())
+            {
+                shoot();
+            }
+        }
+    }
+
+    public void shootMulti()
+    {
+        ShootThread shoot = new ShootThread();
+        shoot.startShooting();
+
+        /*
+        Thread thread = new Thread(new ShootThread());
+        thread.start();
+        */
+    }
+
+    public final void shootAll ()
+    {
+        ShootThread shoot = new ShootThread();
+        shoot.startShooting();
+
+        sleep(600);
+        moveDoor(DOOR_OPEN);
+        sleep(500);
+        while (runConditions())
+        {
+            sleep(300);
+            if(!isBallLoaded())
+            {
+                shoot.stopShooting();
+
+                sleep(1200);
+                moveDoor(DOOR_CLOSED);
+                break;
+            }
         }
         shootingAll = false;
     }

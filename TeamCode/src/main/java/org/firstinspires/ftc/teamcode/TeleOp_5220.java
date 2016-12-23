@@ -315,28 +315,25 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 dPadMode = !dPadMode;
             }
 
-            //if (shooterState == SHOOTER_READY)
-            //{
-                if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
-                {
-                    shootMulti();
+            if (shooterState == SHOOTER_READY)
+            {
+                if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a)) {
+                    shootAllMulti();
                 }
 
                 else if (gamepad2.x)
                 {
-                    setMotorPower(shooterMotor, 1.0);
+                    setMotorPower(shooterMotor, 0.8);
                     shooterChanged = true;
                 }
 
                 else if (gamepad2.y)
                 {
-                    setMotorPower(shooterMotor, -1.0);
+                    setMotorPower(shooterMotor, -0.8);
                     shooterChanged = true;
                 }
                 else setMotorPower(shooterMotor, 0.0);
-            //}
-
-
+            }
 
 
 /*

@@ -1507,8 +1507,8 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        flywheelLeft.setPower(0.8);
-        flywheelRight.setPower(0.8);
+        setMotorPower(flywheelLeft, 0.8);
+        setMotorPower(flywheelRight, 0.8);
     }
 
     private final class ShootThread implements Runnable
@@ -1517,14 +1517,22 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         public void startShooting()
         {
-            shooting = new Thread(this);
-            shooting.start();
+            if(shooting == null)
+            {
+                shooting = new Thread(this);
+                shooting.start();
+                shooterState = SHOOTER_ACTIVE;
+            }
         }
 
         public void stopShooting()
         {
-            shooting.interrupt();
-            shooting = null;
+            if(shooting != null)
+            {
+                shooting.interrupt();
+                shooting = null;
+                shooterState = SHOOTER_READY;
+            }
         }
 
         public void run ()
@@ -1540,11 +1548,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     {
         ShootThread shoot = new ShootThread();
         shoot.startShooting();
-
-        /*
-        Thread thread = new Thread(new ShootThread());
-        thread.start();
-        */
     }
 
     public final void shootAll ()
@@ -1570,18 +1573,43 @@ public abstract class OpMode_5220 extends LinearOpMode
         shootingAll = false;
     }
 
-    private final class ShootAllThread extends Thread
+    private final class ShootAllThread implements Runnable
     {
+        private Thread shooting;
+
+        public void startShooting()
+        {
+            if(shooting == null)
+            {
+                shooting = new Thread(this);
+                shooting.start();
+            }
+        }
+
+        public void stopShooting()
+        {
+            if(shooting != null)
+            {
+                shooting.interrupt();
+                shooting = null;
+            }
+        }
+
         public void run ()
         {
-            shootAll();
+            while(!Thread.currentThread().isInterrupted())
+            {
+                shootAll();
+            }
         }
     }
     protected boolean shootingAll = false;
     public final void shootAllMulti ()
     {
         shootingAll = true;
-        new ShootAllThread().start();
+
+        ShootAllThread shoot = new ShootAllThread();
+        shoot.startShooting();
     }
 
 

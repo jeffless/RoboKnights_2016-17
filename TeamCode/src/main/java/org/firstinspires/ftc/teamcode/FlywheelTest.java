@@ -55,6 +55,12 @@ public class FlywheelTest extends LinearOpMode
 {
     protected DcMotor flywheelLeft;
     protected DcMotor flywheelRight;
+    protected DcMotor sweeperMotor;
+
+    protected Servo doorServo;
+
+    protected static final double DOOR_OPEN = 0.0;
+    protected static final double DOOR_CLOSED = 1.0;
 
     public void runOpMode ()
     {
@@ -68,6 +74,13 @@ public class FlywheelTest extends LinearOpMode
         flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
+        sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        doorServo = hardwareMap.servo.get ("dServo");
+
+        doorServo.setPosition(1.0);
+
         try
         {
             waitForStart();
@@ -78,6 +91,8 @@ public class FlywheelTest extends LinearOpMode
         }
         while (opModeIsActive())
         {
+            sweeperMotor.setPower(1.0);
+
             flywheelLeft.setPower(.8);
             flywheelRight.setPower(.8);
 
@@ -86,4 +101,53 @@ public class FlywheelTest extends LinearOpMode
             telemetry.update();
         }
     }
+
+    public final void shoot()
+    {
+        flywheelLeft.setPower(0.8);
+        flywheelRight.setPower(0.8);
+    }
+
+    private final class ShootThread implements Runnable
+    {
+        private Thread shooting;
+
+        public void startShooting()
+        {
+            if(shooting == null)
+            {
+                shooting = new Thread(this);
+                shooting.start();
+            }
+        }
+
+        public void stopShooting()
+        {
+            if(shooting != null)
+            {
+                shooting.interrupt();
+                shooting = null;
+            }
+        }
+
+        public void run ()
+        {
+            while(!Thread.currentThread().isInterrupted())
+            {
+                shoot();
+            }
+        }
+    }
+
+    public void shootMulti()
+    {
+        ShootThread shoot = new ShootThread();
+        shoot.startShooting();
+    }
+
+    public final void moveDoor(double position)
+    {
+        doorServo.setPosition(position);
+    }
+
 }

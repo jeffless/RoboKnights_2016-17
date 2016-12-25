@@ -204,6 +204,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
+    public static boolean killThread = false;
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
@@ -1569,6 +1570,15 @@ public abstract class OpMode_5220 extends LinearOpMode
                 moveDoor(DOOR_CLOSED);
                 break;
             }
+
+            if(killThread)
+            {
+                shoot.stopShooting();
+
+                moveDoor(DOOR_CLOSED);
+                killThread = false;
+                break;
+            }
         }
         shootingAll = false;
     }
@@ -1586,21 +1596,10 @@ public abstract class OpMode_5220 extends LinearOpMode
             }
         }
 
-        public void stopShooting()
-        {
-            if(shooting != null)
-            {
-                shooting.interrupt();
-                shooting = null;
-            }
-        }
-
         public void run ()
         {
-            while(!Thread.currentThread().isInterrupted())
-            {
-                shootAll();
-            }
+            shootAll();
+            shooting = null;
         }
     }
     protected boolean shootingAll = false;

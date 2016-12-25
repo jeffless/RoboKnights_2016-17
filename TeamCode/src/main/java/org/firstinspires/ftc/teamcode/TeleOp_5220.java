@@ -43,27 +43,6 @@ import org.firstinspires.ftc.teamcode.OpMode_5220;
 //@Disabled
 public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long comment.
 {
-    private static final double JOYSTICK_THRESHOLD = 0.08; //below this joysticks won't cause movement.
-    private static final double SLOW_POWER = 0.10;
-
-
-    private static final double SWIVEL_INCREMENT = 0.00658; //changed from 0.005
-
-    private static final double SWIVEL_INCREMENT_TIME = 60; //in millis, every incrmeent time, it goes 0.01 counts. about 24 increments to go 180 then.
-    private static final double SWIVEL_INERTIA_CORRECTION_MULTIPLIER = 0.5;
-
-    private static final double DUMPER_INCREMENT = 0.025; //changed from 0.005
-    private static final double DUMPER_INCREMENT_TIME = 60; //in millis, every incrmeent time, it goes 0.01 counts. about 24 increments to go 180 then.
-
-
-    private static final double ARM_INCREMENT = 0.04;
-    private static final double ARM_INCREMENT_TIME = 30; //in millis, every incrmeent time, it goes 0.01 counts. about 24 increments to go 180 then.
-
-
-    private static final double HOOK_TILT_INCREMENT = 0.072;
-
-    private static final double POLAR_CONTROL_R_THRESHOLD = 0.8; //max R value should be about 1
-
     private double g1Stick1Xinit;
     private double g1Stick1Yinit;
 
@@ -71,12 +50,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
     private boolean reverseDriveOn = false;
     private boolean slowDriveOn = false;
-    private boolean polarOn = false;
-    private boolean resetAutomationOn = false;
-    private boolean scoringAutomationOn = false;
     private boolean fieldOrient = false;
 
-    private double throttle, direction, strafe;
     private double temp, theta;
     private double leftFront, leftBack, rightBack, rightFront;
 
@@ -317,8 +292,14 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
             if (shooterState == SHOOTER_READY)
             {
-                if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a)) {
+                if ((!shootingAll && gamepad1.a && !prevGamepad1.a) || (!shootingAll && gamepad2.a && !prevGamepad2.a))
+                {
                     shootAllMulti();
+                }
+
+                else if((shootingAll && gamepad1.a && !prevGamepad1.a) || (shootingAll && gamepad2.a && !prevGamepad2.a))
+                {
+                    killThread = true;
                 }
 
                 else if (gamepad2.x)

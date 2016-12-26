@@ -45,29 +45,31 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class FlywheelTest extends LinearOpMode
 {
-    private DcMotor flywheelLeft;
-    private DcMotor flywheelRight;
+    protected DcMotor flywheelLeft;
+    protected DcMotor flywheelRight;
     protected DcMotor sweeperMotor;
 
     //double kI = 0.025;
-    double kP = 0.0;
-    double kI = 0.0;
-    double kD = 0.0;
+    private double kP = 0.0;
+    private double kI = 0.0;
+    private double kD = 0.0;
 
-    double integral;
-    double derivative;
+    private double integral;
+    private double derivative;
 
-    double motorOut = 0.0;
-    double fTarget = 800;
-    double fVelocity = 0.0;
-    double fError = 0.0;
-    double fLastError = 0.0;
-    double tbh = 0;
+    private double motorOut = 0.0;
+    private double fTarget = 800;
+    private double fVelocity = 0.0;
+    private double fError = 0.0;
+    private double fLastError = 0.0;
+    private double tbh = 0;
 
-    long fEncoder = 0;
-    long fVelocityTime = 0;
-    long fLastEncoder = 0;
-    long fLastVelocityTime = 0;
+    private long fEncoder = 0;
+    private long fVelocityTime = 0;
+    private long fLastEncoder = 0;
+    private long fLastVelocityTime = 0;
+
+    private double place = .1;
 
     public void runOpMode ()
     {
@@ -111,7 +113,9 @@ public class FlywheelTest extends LinearOpMode
         fEncoder = flywheelLeft.getCurrentPosition();
         fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
 
-        telemetry.addData("5", "" + fVelocity);
+        telemetry.addData("3", "Place " + place);
+        telemetry.addData("4", "Error " + place);
+        telemetry.addData("5", "Velocity " + fVelocity);
         telemetry.update();
     }
 
@@ -176,7 +180,22 @@ public class FlywheelTest extends LinearOpMode
     {
         if(gamepad1.right_bumper)
         {
-            kP += 0.05;
+            kP += (1.0 * place);
+        }
+
+        if(gamepad1.left_bumper)
+        {
+            kP -= (1.0 * place);
+        }
+
+        if(gamepad1.right_trigger > 0.7)
+        {
+            place *= 10.0;
+        }
+
+        if(gamepad1.left_trigger > 0.7)
+        {
+            place *= 0.1;
         }
     }
 }

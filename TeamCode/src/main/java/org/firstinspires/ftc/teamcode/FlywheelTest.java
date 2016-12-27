@@ -49,42 +49,47 @@ public class FlywheelTest extends LinearOpMode
     protected DcMotor flywheelRight;
     protected DcMotor sweeperMotor;
 
+    protected Servo doorServo;
+
     //double kI = 0.025;
-    private double kP = 0.0;
+    private double kP = 0.12;
     private double kI = 0.0;
     private double kD = 0.0;
 
-    private double integral;
-    private double derivative;
+    private double integral = 0.0;
+    private double derivative = 0.0;
 
     private double motorOut = 0.0;
-    private double fTarget = 800;
+    private double fTarget = 7.0e-7;
     private double fVelocity = 0.0;
     private double fError = 0.0;
     private double fLastError = 0.0;
-    private double tbh = 0;
+    private double tbh = 0.0;
 
-    private long fEncoder = 0;
+    private int fEncoder = 0;
+    private int fLastEncoder = 0;
+
     private long fVelocityTime = 0;
-    private long fLastEncoder = 0;
     private long fLastVelocityTime = 0;
 
-    private double place = .1;
+    private double place = 0.1;
 
     public void runOpMode ()
     {
         flywheelLeft = hardwareMap.dcMotor.get("fl");
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         flywheelRight = hardwareMap.dcMotor.get("fr");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
         sweeperMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        doorServo = hardwareMap.servo.get("dServo");
 
         try
         {
@@ -96,27 +101,30 @@ public class FlywheelTest extends LinearOpMode
         }
         while (opModeIsActive())
         {
-            flywheelLeft.setPower(.73);
-            flywheelRight.setPower(.73);
+            doorServo.setPosition(0.9);
+            bangBang();
 
-            printVelocity();
-
-            //setFPower(calculatePID());
-            telemetry.addData("4", "" + kP);
-            telemetry.addData("5", "" + fVelocity);
+            doorServo.setPosition(0.60); //down position
+            sleep(2000);
         }
     }
 
     private void printVelocity()
     {
         fVelocityTime = System.nanoTime();
-        fEncoder = flywheelLeft.getCurrentPosition();
-        fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fEncoder = flywheelRight.getCurrentPosition();
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
 
-        telemetry.addData("3", "Place " + place);
-        telemetry.addData("4", "Error " + place);
-        telemetry.addData("5", "Velocity " + fVelocity);
+        telemetry.addData("3", "Time " + fVelocityTime);
+        telemetry.addData("4", "Encoder " + fEncoder);
+        telemetry.addData("5", "Last Encoder " + fLastEncoder);
+        telemetry.addData("6", "Encoder Change " + (fEncoder - fLastEncoder));
+        telemetry.addData("7", "Time Change " + (fVelocityTime - fLastVelocityTime));
+        telemetry.addData("8", "Velocity " + fVelocity);
         telemetry.update();
+
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
     }
 
     private void setFPower(double power)
@@ -130,7 +138,7 @@ public class FlywheelTest extends LinearOpMode
     {
         fVelocityTime = System.nanoTime();
         fEncoder = flywheelLeft.getCurrentPosition();
-        fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fVelocity = ((double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime));
         fError = fTarget - fVelocity;
 
         integral += fError;
@@ -150,7 +158,7 @@ public class FlywheelTest extends LinearOpMode
     {
         fVelocityTime = System.nanoTime();
         fEncoder = flywheelLeft.getCurrentPosition();
-        fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
         fError = fTarget - fVelocity;
 
         integral += fError;
@@ -170,9 +178,9 @@ public class FlywheelTest extends LinearOpMode
         fLastEncoder = fEncoder;
         fLastVelocityTime = fVelocityTime;
 
-        motorOut = kP * fError + kI * integral + kD * derivative;
+        motorOut = (kP * fError) + (kI * integral) + (kD * derivative);
 
-        Range.clip(motorOut, 0, 1);
+        Range.clip(motorOut, 0.0, 1.0);
         return motorOut;
     }
 
@@ -181,17 +189,20 @@ public class FlywheelTest extends LinearOpMode
     {
         fVelocityTime = System.nanoTime();
         fEncoder = flywheelLeft.getCurrentPosition();
-        fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+        fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
 
-        if(fVelocity > fTarget)
+        if(fVelocity >= fTarget)
         {
-            setFPower(.73);
+            setFPower(.36);
         }
 
         else if(fVelocity < fTarget)
         {
-            setFPower(1.0);
+            setFPower(0.81);
         }
+
+        fLastEncoder = fEncoder;
+        fLastVelocityTime = fVelocityTime;
     }
 
     public void adjustPID()

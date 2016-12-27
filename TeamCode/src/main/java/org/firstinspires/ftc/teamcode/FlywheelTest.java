@@ -180,7 +180,7 @@ public class FlywheelTest extends LinearOpMode
 
         motorOut = (kP * fError) + (kI * integral) + (kD * derivative);
 
-        Range.clip(motorOut, 0.0, 1.0);
+        motorOut = Range.clip(motorOut, 0.0, 1.0);
         return motorOut;
     }
 

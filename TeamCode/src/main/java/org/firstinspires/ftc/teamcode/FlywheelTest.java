@@ -176,6 +176,24 @@ public class FlywheelTest extends LinearOpMode
         return motorOut;
     }
 
+
+    public void bangBang()
+    {
+        fVelocityTime = System.nanoTime();
+        fEncoder = flywheelLeft.getCurrentPosition();
+        fVelocity = (fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
+
+        if(fVelocity > fTarget)
+        {
+            setFPower(.73);
+        }
+
+        else if(fVelocity < fTarget)
+        {
+            setFPower(1.0);
+        }
+    }
+
     public void adjustPID()
     {
         if(gamepad1.right_bumper)

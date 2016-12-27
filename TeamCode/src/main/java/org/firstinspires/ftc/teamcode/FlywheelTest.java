@@ -78,13 +78,13 @@ public class FlywheelTest extends LinearOpMode
     {
         flywheelLeft = hardwareMap.dcMotor.get("fl");
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheelLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         flywheelRight = hardwareMap.dcMotor.get("fr");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheelRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
         sweeperMotor.setDirection(DcMotorSimple.Direction.REVERSE);

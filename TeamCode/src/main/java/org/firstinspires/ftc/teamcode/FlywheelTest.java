@@ -37,6 +37,8 @@ Add ultrasonic sensor when we add rescue beacon detection?
 //NOTE: Do NOT put waitFullCycle in loops. Only put in between other stuff
 
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.util.Range;
@@ -51,16 +53,17 @@ public class FlywheelTest extends LinearOpMode
 
     protected Servo doorServo;
 
-    //double kI = 0.025;
-    private double kP = 0.12;
+    double tbhI = 300.0;
+    private double kP = 9000000.0;
     private double kI = 0.0;
-    private double kD = 0.0;
+    //private double kD = 380000;
+    private double kD = 10000.0;
 
     private double integral = 0.0;
     private double derivative = 0.0;
 
     private double motorOut = 0.0;
-    private double fTarget = 7.0e-7;
+    private double fTarget = 7.5e-7;
     private double fVelocity = 0.0;
     private double fError = 0.0;
     private double fLastError = 0.0;
@@ -74,22 +77,30 @@ public class FlywheelTest extends LinearOpMode
 
     private double place = 0.1;
 
+    private boolean firstCross;
+
+    private double tolerance = 0.5e-7;
+
+    private static final String TAG = "MyActivity";
+
     public void runOpMode ()
     {
         flywheelLeft = hardwareMap.dcMotor.get("fl");
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flywheelLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         flywheelRight = hardwareMap.dcMotor.get("fr");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flywheelRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
         sweeperMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         doorServo = hardwareMap.servo.get("dServo");
+
+        firstCross = true;
 
         try
         {
@@ -101,11 +112,13 @@ public class FlywheelTest extends LinearOpMode
         }
         while (opModeIsActive())
         {
-            doorServo.setPosition(0.9);
-            bangBang();
-
-            doorServo.setPosition(0.60); //down position
-            sleep(2000);
+            //bangBang();
+            //calculateTBH();
+            //sleep(100);
+            //setFPower(.79);
+            setFPower(.98);
+            printVelocity();
+            sleep(100);
         }
     }
 
@@ -134,27 +147,59 @@ public class FlywheelTest extends LinearOpMode
     }
 
     //TBH CODE
-    private double calculateTBH()
+    private void calculateTBH()
     {
         fVelocityTime = System.nanoTime();
         fEncoder = flywheelLeft.getCurrentPosition();
         fVelocity = ((double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime));
         fError = fTarget - fVelocity;
 
-        integral += fError;
-        motorOut = integral * kI;
+        motorOut = motorOut  + (fError * tbhI);
+
+        motorOut = Range.clip(motorOut, 0 ,1);
+
+        if(Math.signum(fError) != Math.signum(fLastError))
+        {
+            if(firstCross)
+            {
+                motorOut = 0.3;
+                firstCross = false;
+            }
+
+            else
+            {
+                motorOut = 0.5 * (motorOut + tbh);
+            }
+
+            tbh = motorOut;
+        }
+
+        fLastError = fError;
+
+        setFPower(motorOut );
+
+        /*integral += fError;
+        motorOut = integral * tbhI;
         Range.clip(motorOut, 0, 1);
 
         if(Math.signum(fError) != Math.signum(fLastError))
         {
-            tbh = (motorOut + tbh) / 2;
-            motorOut = tbh;
+            if(firstCross)
+            {
+                motorOut = .3;
+                firstCross = false;
+            }
+            else
+            {
+                tbh = (motorOut + tbh) / 2;
+                motorOut = tbh;
+            }
             fLastError = fError;
         }
-        return motorOut;
+        return motorOut; */
     }
 
-    private double calculatePID()
+    private void calculatePID()
     {
         fVelocityTime = System.nanoTime();
         fEncoder = flywheelLeft.getCurrentPosition();
@@ -181,7 +226,21 @@ public class FlywheelTest extends LinearOpMode
         motorOut = (kP * fError) + (kI * integral) + (kD * derivative);
 
         motorOut = Range.clip(motorOut, 0.0, 1.0);
-        return motorOut;
+
+        telemetry.addData("1", "kP " + (kP * fError));
+        telemetry.addData("2", "Error " + fError);
+        telemetry.addData("3", "Time " + fVelocityTime);
+        telemetry.addData("4", "Encoder " + fEncoder);
+        telemetry.addData("5", "Last Encoder " + fLastEncoder);
+        telemetry.addData("6", "Encoder Change " + (fEncoder - fLastEncoder));
+        telemetry.addData("7", "Time Change " + (fVelocityTime - fLastVelocityTime));
+        telemetry.addData("8", "Velocity " + fVelocity);
+        telemetry.addData("9", "Result " + motorOut);
+        telemetry.update();
+
+        Log.wtf(TAG, String.valueOf(fError));
+
+        setFPower(motorOut);
     }
 
 
@@ -191,14 +250,14 @@ public class FlywheelTest extends LinearOpMode
         fEncoder = flywheelLeft.getCurrentPosition();
         fVelocity = (double)(fEncoder - fLastEncoder) / (fVelocityTime - fLastVelocityTime);
 
-        if(fVelocity >= fTarget)
+        if(fVelocity >= (fTarget + tolerance))
         {
-            setFPower(.36);
+            setFPower(.84);
         }
 
-        else if(fVelocity < fTarget)
+        else if(fVelocity < (fTarget - tolerance))
         {
-            setFPower(0.81);
+            setFPower(.9);
         }
 
         fLastEncoder = fEncoder;

@@ -35,7 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "Demo 5220", group = "Main")
+@Autonomous(name = "Demo 5220", group = "Main")
 //@Disabled
 public class Demo_Drive_5220 extends OpMode
 {

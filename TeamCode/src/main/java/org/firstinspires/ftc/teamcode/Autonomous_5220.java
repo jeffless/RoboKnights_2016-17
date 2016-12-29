@@ -313,7 +313,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     //AUTONOMOUS ONLY UTILITIES
 
-    private void shootAutonomousBalls() 
+    /*private void shootAutonomousBalls()
     {
         shoot();
         moveDoor (DOOR_OPEN);
@@ -323,17 +323,6 @@ public class Autonomous_5220 extends OpMode_5220
         moveDoor(DOOR_CLOSED);
         shoot();
         sleep(100);
-
-        /*
-        setSweeperPower(1.0);
-        sleep(500);
-
-        setSweeperPower(0.0);
-        sleep(500);
-
-        shoot();
-        sleep(100);
-        */
     }
 
     private void doubleShootAutonomousBalls()
@@ -341,6 +330,7 @@ public class Autonomous_5220 extends OpMode_5220
         shoot();
         sleep(250);
     }
+*/
 
     private void diagonalStrafeAgainstWall(boolean direction, double... params)
     {
@@ -587,7 +577,8 @@ public class Autonomous_5220 extends OpMode_5220
             move(-14);
             sleep(1200);
 
-            shoot();
+            //
+            // shoot();
             sleep(250);
             move(-47);
         }

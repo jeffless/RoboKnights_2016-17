@@ -39,6 +39,7 @@ import android.view.View;
 //import com.qualcomm.ftcrobotcontroller.FtcRobotControllerActivity;
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.*;
+import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.util.*;
@@ -137,11 +138,8 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double LINE_WHITE_THRESHOLD = 28;
 
-    protected static final double DOOR_OPEN = 0.0;
-    protected static final double DOOR_CLOSED = 1.0;
-
-    protected static final double LIFT_TILT_BACKWARDS = 0.27;
-    protected static final double LIFT_TILT_FORWARDS = 0.523;
+    protected static final double DOOR_OPEN = 0.6;
+    protected static final double DOOR_CLOSED = 0.9;
 
     protected static final double RP_IN = 0.0;
     protected static final double RP_RELEASE = 0.08;
@@ -149,8 +147,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
-    protected static final double[] SHOOTER_TILT = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
-    protected int currentShooterPreset = 4;
 
     //MOTORS AND SERVOS:
 
@@ -163,7 +159,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected DcMotor rightBackMotor;
     protected DcMotor shooterMotor;
     protected DcMotor sweeperMotor;
-    protected DcMotor sweeperMotor2;
     protected DcMotor liftMotor;
     protected DcMotor flywheelLeft;
     protected DcMotor flywheelRight;
@@ -171,13 +166,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected DcMotor[] driveMotors = new DcMotor[4];
     protected int[] driveMotorInitValues = new int[4];
 
-    protected Servo swivelServo;
-    protected Servo shooterTiltServo;
     protected Servo doorServo;
     protected Servo autoExtendServo;
-    protected Servo liftTiltServo;
-
-    protected double swivelServoInit;
 
     //SENSORS:
 
@@ -205,6 +195,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
     public static boolean killThread = false;
+    public static boolean shooterRunning = false;
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
@@ -233,34 +224,21 @@ public abstract class OpMode_5220 extends LinearOpMode
         driveMotors[2] = leftBackMotor;
         driveMotors[3] = rightBackMotor;
 
-        /*
-        shooterMotor = hardwareMap.dcMotor.get("shooter");
-        shooterMotor.setDirection(DcMotor.Direction.REVERSE);
-        sweeperMotor2 = hardwareMap.dcMotor.get("sweeper2");
-        sweeperMotor2.setDirection(DcMotor.Direction.FORWARD);
-         */
+        flywheelLeft = hardwareMap.dcMotor.get("flywheel1");
+        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        flywheelRight = hardwareMap.dcMotor.get("flywheel2");
+        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
-        sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
+        sweeperMotor.setDirection(DcMotor.Direction.REVERSE);
         liftMotor = hardwareMap.dcMotor.get("lift");
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        flywheelLeft = hardwareMap.dcMotor.get("fl");
-        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheelLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        flywheelRight = hardwareMap.dcMotor.get("fr");
-        flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheelRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-       // swivelServo = hardwareMap.servo.get("sServo");
-
-        //shooterTiltServo = hardwareMap.servo.get("trServo");
         doorServo = hardwareMap.servo.get ("dServo");
         autoExtendServo = hardwareMap.servo.get("rpServo");
-        liftTiltServo = hardwareMap.servo.get ("ltServo");
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
@@ -274,11 +252,8 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public void initialize()
     {
-        shooterInit = getEncoderValue(shooterMotor);
-        setShooterPreset(currentShooterPreset);
-        moveLiftTiltServo(LIFT_TILT_BACKWARDS);
         moveRackAndPinion(RP_IN);
-        moveDoor (DOOR_CLOSED);
+        moveDoor (DOOR_OPEN);
 
         waitFullCycle();
 /*
@@ -378,19 +353,17 @@ public abstract class OpMode_5220 extends LinearOpMode
                 fh = df.format(navX.getFusedHeading());
                 yprf = yaw + ", " + pitch + ", " + roll + ", " + fh;
 
-                telemetry.addData("1", "Time Elapsed:" + gameTimer.time());
+                /*telemetry.addData("1", "Time Elapsed:" + gameTimer.time());
 
                 telemetry.addData("2", "LFM: " + leftFrontMotor.getCurrentPosition() + ", RFM: " + rightFrontMotor.getCurrentPosition());
                 telemetry.addData("3", "LBM: " + leftBackMotor.getCurrentPosition() + ", RBM: " + rightBackMotor.getCurrentPosition());
-                telemetry.addData("4", "Shooter: " + shooterPosition());
 
                 telemetry.addData("5", "Down: R = " + colorSensorDown.red() + ", G = " + colorSensorDown.green() + ", B = " + colorSensorDown.blue() + ", A = " +  colorSensorDown.alpha());
                 telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
-                telemetry.addData("8", "Shooter Tilt: " + SHOOTER_TILT[currentShooterPreset]);
 
                 //waitOneFullHardwareCycle();
-                telemetry.update();
+                telemetry.update(); */
             }
         }
     }
@@ -1365,29 +1338,11 @@ public abstract class OpMode_5220 extends LinearOpMode
     public final void setSweeperPower (double power)
     {
         setMotorPower(sweeperMotor, power);
-        setMotorPower(sweeperMotor2, power);
     }
 
     public final void moveRackAndPinion (double position)
     {
         autoExtendServo.setPosition(position);
-    }
-
-    public final void moveLiftTiltServo (double position)
-    {
-        liftTiltServo.setPosition(position);
-    }
-
-    public final void moveShooterTiltServo (double position)
-    {
-        shooterTiltServo.setPosition(position);
-    }
-
-    public final void setShooterPreset (int preset)
-    {
-        if (preset < 0 || preset >= SHOOTER_TILT.length) return;
-        moveShooterTiltServo(SHOOTER_TILT[preset]);
-        currentShooterPreset = preset;
     }
 
     public final boolean isBallLoaded () //use sensor soon
@@ -1399,152 +1354,67 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected int shooterOffset = 0;
     protected int shooterInit = 0;
 
-    public static final int ENCODER_COUNTS_PER_ROTATION_NR60 = (ENCODER_COUNTS_PER_ROTATION * 3) / 2;
-
 
     protected boolean shooterChanged = false;
     protected int shooterState = SHOOTER_READY;
     public static final int SHOOTER_READY = 0, SHOOTER_ACTIVE = 1, SHOOTER_SETUP = 2;
 
-    public final int shooterPosition ()
+    public final void shoot()
     {
-        return (getEncoderValue(shooterMotor) - shooterInit);
+        setMotorPower(flywheelLeft, 0.90);
+        setMotorPower(flywheelRight, 0.90);
+        shooterRunning = true;
+        shooterState = SHOOTER_ACTIVE;
+    }
+
+    public final void stopShooting()
+    {
+        setMotorPower(flywheelLeft, 0);
+        setMotorPower(flywheelRight, 0);
+        shooterRunning = false;
+    }
+
+    public final class ShootThread implements Runnable
+    {
+        public volatile boolean running = true;
+
+        public void terminate()
+        {
+            running = false;
+        }
+
+        public void begin()
+        {
+            running = true;
+        }
+
+        public void run ()
+        {
+            telemetry.addData("1", "Running thread");
+            telemetry.update();
+
+            while(opModeIsActive())
+            {
+                if(running)
+                {
+                    telemetry.addData("2", "Running = true");
+                    telemetry.update();
+                    shoot();
+                }
+
+                else
+                {
+                    stopShooting();
+                    shooterState = SHOOTER_READY;
+                    telemetry.addData("3", "Running = false");
+                    telemetry.update();
+
+                }
+            }
+        }
     }
 
     /*
-    public final void shoot ()
-    {
-        if (shooterState != SHOOTER_READY) return;
-        shooterState = SHOOTER_ACTIVE;
-
-        if (shooterChanged)
-        {
-            shooterInit = getEncoderValue(shooterMotor);
-            shooterTarget = ENCODER_COUNTS_PER_ROTATION_NR60;
-            shooterChanged = false;
-        }
-
-
-        //unused section
-        else if (nMotorEncoder[shooter] >= (14400))
-        {
-            offset = nMotorEncoder[shooter] - target;
-            nMotorEncoder[shooter] = 0;
-            target = 2880 - offset;
-        }
-
-        else
-        {
-            shooterTarget += ENCODER_COUNTS_PER_ROTATION_NR60;
-        }
-
-        int currentStart = shooterPosition();
-
-        writeToLog("SHOOTING: currentStart = " + currentStart + ", target = " + shooterTarget);
-        setMotorPower(shooterMotor, 1.0);
-
-        while (runConditions() && shooterPosition() < shooterTarget)
-        {
-            if (shooterState == SHOOTER_ACTIVE && shooterPosition() > currentStart + (ENCODER_COUNTS_PER_ROTATION_NR60 / 2)) //if the shooter has already shot the ball but is still resetting
-            {
-                shooterState = SHOOTER_SETUP;
-            }
-        }
-        writeToLog ("SHOT: final encoder value: " + shooterPosition());
-
-        waitFullCycle();
-        setMotorPower(shooterMotor, 0);
-        sleep(50);
-        shooterState = SHOOTER_READY;
-        waitFullCycle();
-
-    }
-
-
-    private final class ShootThread extends Thread
-    {
-        public void run ()
-        {
-            shoot();
-        }
-    }
-
-    public final void shootMulti ()
-    {
-        new ShootThread().start();
-    }
-
-    public final void shootAll ()
-    {
-        while (runConditions())
-        {
-            moveDoor (DOOR_OPEN);
-            sleep(1550);
-            moveDoor(DOOR_CLOSED);
-            sleep (550);
-            setSweeperPower(1.0);
-            shootMulti();
-            sleep (1550);
-            setSweeperPower(0);
-            if (!isBallLoaded()) break;
-        }
-        shootingAll = false;
-    }
-
-    private final class ShootAllThread extends Thread
-    {
-        public void run ()
-        {
-            shootAll();
-        }
-    }
-    protected boolean shootingAll = false;
-    public final void shootAllMulti ()
-    {
-        shootingAll = true;
-        new ShootAllThread().start();
-    }
-    */
-
-    public final void shoot()
-    {
-        setMotorPower(flywheelLeft, 0.8);
-        setMotorPower(flywheelRight, 0.8);
-    }
-
-    private final class ShootThread implements Runnable
-    {
-        private Thread shooting;
-
-        public void startShooting()
-        {
-            if(shooting == null)
-            {
-                shooting = new Thread(this);
-                shooting.start();
-                shooterState = SHOOTER_ACTIVE;
-            }
-        }
-
-        public void stopShooting()
-        {
-            if(shooting != null)
-            {
-                shooting.interrupt();
-                shooting = null;
-                shooterState = SHOOTER_READY;
-            }
-        }
-
-        public void run ()
-        {
-            while(!Thread.currentThread().isInterrupted())
-            {
-                shoot();
-            }
-        }
-    }
-
     public void shootMulti()
     {
         ShootThread shoot = new ShootThread();
@@ -1610,6 +1480,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         ShootAllThread shoot = new ShootAllThread();
         shoot.startShooting();
     }
+    */
 
 
     public double getFloorBrightness ()

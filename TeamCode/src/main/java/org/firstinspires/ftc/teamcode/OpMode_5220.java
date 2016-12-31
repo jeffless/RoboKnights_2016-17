@@ -1374,7 +1374,67 @@ public abstract class OpMode_5220 extends LinearOpMode
         shooterRunning = false;
     }
 
-    public final class ShootThread implements Runnable
+    public class ShootThread implements Runnable
+    {
+        Thread thrd;
+
+        private boolean suspended;
+        private boolean stopped;
+
+        ShootThread()
+        {
+            thrd = new Thread(this);
+            suspended = true;
+            stopped = false;
+            thrd.start();
+        }
+
+        public void run()
+        {
+            try
+            {
+                while(runConditions())
+                {
+                    shoot();
+
+                    synchronized (this)
+                    {
+                        while(suspended)
+                        {
+                            stopShooting();
+                            wait();
+                        }
+                        if(stopped) break;
+                    }
+                }
+            } catch(InterruptedException exc){}
+        }
+
+        synchronized void mStop()
+        {
+            stopped = true;
+            suspended = false;
+            notify();
+        }
+
+        synchronized void mSuspend()
+        {
+            suspended = true;
+        }
+
+        synchronized void mResume ()
+        {
+            suspended = false;
+            notify();
+        }
+
+        public boolean isSuspended()
+        {
+            return suspended;
+        }
+    }
+
+    /*public final class ShootThread implements Runnable
     {
         public volatile boolean running = true;
 
@@ -1412,7 +1472,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 }
             }
         }
-    }
+    } */
 
     /*
     public void shootMulti()

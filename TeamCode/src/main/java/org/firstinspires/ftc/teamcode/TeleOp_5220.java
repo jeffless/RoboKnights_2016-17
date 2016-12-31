@@ -53,8 +53,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     private static final boolean DPAD_DRIVE = true;
     private boolean dPadMode = DPAD_LIFT;
 
-    private Thread shoot = null;
-    private ShootThread runnable = null;
+    private ShootThread shoot;
 
     public ProgramType getProgramType ()
     {
@@ -329,7 +328,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             }
             */
 
-            if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
+            /*if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
             {
                 if(!runnable.running)
                 {
@@ -343,6 +342,22 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 {
                     runnable.terminate();
                     shoot = null;
+                    moveDoor(DOOR_CLOSED);
+                }
+            } */
+
+            if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
+            {
+                if(shoot.isSuspended())
+                {
+                    shoot.mResume();
+                    sleep(800);
+                    moveDoor(DOOR_OPEN);
+                }
+
+                else
+                {
+                    shoot.mSuspend();
                     moveDoor(DOOR_CLOSED);
                 }
             }
@@ -466,9 +481,11 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         waitFullCycle();
 *.*/
 
-        runnable = new ShootThread();
+        /*runnable = new ShootThread();
         shoot = new Thread (runnable);
-        shoot.start();
+        shoot.start();*/
+
+        shoot = new ShootThread();
 
         while (runConditions())
         {

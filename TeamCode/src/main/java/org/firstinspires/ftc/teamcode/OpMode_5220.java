@@ -101,7 +101,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double DETECT_BLUE = 2;
 
     protected static final double WHEEL_DIAMETER = 4.0; //in inches
-    protected static final double GEAR_RATIO = 1.0;
+    protected static final double GEAR_RATIO = (1.5);
     protected static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     protected static final int ENCODER_COUNTS_PER_ROTATION = 1120; //WAS 1440
 
@@ -145,6 +145,9 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double RP_RELEASE = 0.08;
     protected static final double RP_OUT = 0.4;
 
+    protected static final double HOOK_IN = 0.85;
+    protected static final double HOOK_RELEASE = 0.4;
+
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
 
@@ -157,7 +160,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected DcMotor rightFrontMotor;
     protected DcMotor leftBackMotor;
     protected DcMotor rightBackMotor;
-    protected DcMotor shooterMotor;
     protected DcMotor sweeperMotor;
     protected DcMotor liftMotor;
     protected DcMotor flywheelLeft;
@@ -168,6 +170,8 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected Servo doorServo;
     protected Servo autoExtendServo;
+
+    protected Servo hookServo;
 
     //SENSORS:
 
@@ -194,7 +198,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
-    public static boolean killThread = false;
     public static boolean shooterRunning = false;
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
@@ -226,19 +229,21 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         flywheelLeft = hardwareMap.dcMotor.get("flywheel1");
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         flywheelRight = hardwareMap.dcMotor.get("flywheel2");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheelRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         sweeperMotor = hardwareMap.dcMotor.get("sweeper1");
         sweeperMotor.setDirection(DcMotor.Direction.REVERSE);
+
         liftMotor = hardwareMap.dcMotor.get("lift");
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         doorServo = hardwareMap.servo.get ("dServo");
         autoExtendServo = hardwareMap.servo.get("rpServo");
+        hookServo = hardwareMap.servo.get("hServo");
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
@@ -253,7 +258,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     public void initialize()
     {
         moveRackAndPinion(RP_IN);
-        moveDoor (DOOR_OPEN);
+        moveHook(HOOK_IN);
+        //moveDoor(DOOR_CLOSED);
 
         waitFullCycle();
 /*
@@ -353,7 +359,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 fh = df.format(navX.getFusedHeading());
                 yprf = yaw + ", " + pitch + ", " + roll + ", " + fh;
 
-                /*telemetry.addData("1", "Time Elapsed:" + gameTimer.time());
+                telemetry.addData("1", "Time Elapsed:" + gameTimer.time());
 
                 telemetry.addData("2", "LFM: " + leftFrontMotor.getCurrentPosition() + ", RFM: " + rightFrontMotor.getCurrentPosition());
                 telemetry.addData("3", "LBM: " + leftBackMotor.getCurrentPosition() + ", RBM: " + rightBackMotor.getCurrentPosition());
@@ -363,7 +369,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
                 //waitOneFullHardwareCycle();
-                telemetry.update(); */
+                telemetry.update();
             }
         }
     }
@@ -1335,6 +1341,11 @@ public abstract class OpMode_5220 extends LinearOpMode
         doorServo.setPosition(position);
     }
 
+    public final void moveHook(double position)
+    {
+        hookServo.setPosition(position);
+    }
+
     public final void setSweeperPower (double power)
     {
         setMotorPower(sweeperMotor, power);
@@ -1361,8 +1372,8 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        setMotorPower(flywheelLeft, 0.90);
-        setMotorPower(flywheelRight, 0.90);
+        setMotorPower(flywheelLeft, 0.88);
+        setMotorPower(flywheelRight, 0.88);
         shooterRunning = true;
         shooterState = SHOOTER_ACTIVE;
     }
@@ -1434,53 +1445,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         }
     }
 
-    /*public final class ShootThread implements Runnable
-    {
-        public volatile boolean running = true;
-
-        public void terminate()
-        {
-            running = false;
-        }
-
-        public void begin()
-        {
-            running = true;
-        }
-
-        public void run ()
-        {
-            telemetry.addData("1", "Running thread");
-            telemetry.update();
-
-            while(opModeIsActive())
-            {
-                if(running)
-                {
-                    telemetry.addData("2", "Running = true");
-                    telemetry.update();
-                    shoot();
-                }
-
-                else
-                {
-                    stopShooting();
-                    shooterState = SHOOTER_READY;
-                    telemetry.addData("3", "Running = false");
-                    telemetry.update();
-
-                }
-            }
-        }
-    } */
-
     /*
-    public void shootMulti()
-    {
-        ShootThread shoot = new ShootThread();
-        shoot.startShooting();
-    }
-
     public final void shootAll ()
     {
         ShootThread shoot = new ShootThread();

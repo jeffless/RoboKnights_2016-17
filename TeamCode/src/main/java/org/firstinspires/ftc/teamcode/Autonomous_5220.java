@@ -69,6 +69,9 @@ public class Autonomous_5220 extends OpMode_5220
     private boolean firstBeacon = NEAR;
     private boolean secondBeaconOn = true;
     private int endPath = END_BALL;
+    private boolean runCollector = false;
+
+    private ShootThread shoot;
 
     public ProgramType getProgramType ()
     {
@@ -100,9 +103,10 @@ public class Autonomous_5220 extends OpMode_5220
         private static final int FIRST_BEACON = 3;
         private static final int SECOND_BEACON_ON = 4;
         private static final int PATH = 5;
+        private static final int COLLECTOR = 6;
 
 
-        private static final int NUM_SETTINGS = 6; //always make sure this is correct.
+        private static final int NUM_SETTINGS = 7; //always make sure this is correct.
 
         private int currentSetting = 0;
 
@@ -118,6 +122,7 @@ public class Autonomous_5220 extends OpMode_5220
             telemetryLines[FIRST_BEACON] = ("First Beacon Choice: " + ((firstBeacon == NEAR) ? "NEAR" : "FAR"));
             telemetryLines[SECOND_BEACON_ON] = ("Second Beacon Scoring: " + (secondBeaconOn ? "ON" : "OFF"));
             telemetryLines[PATH] = (endPathToString(endPath));
+            telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "OFF" : "ON"));
             writeLinesToTelemetry();
 
             boolean prevL = false;
@@ -253,6 +258,12 @@ public class Autonomous_5220 extends OpMode_5220
                 telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
             }
 
+            else if (setting == COLLECTOR)
+            {
+                runCollector = !runCollector;
+                telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "OFF" : "ON"));
+            }
+
             if (telemetryLines[currentSetting].charAt(0) != '*') //change to string equals comparison if this doesn't work
             {
                 telemetryLines[currentSetting] = "*" + telemetryLines[currentSetting];
@@ -313,24 +324,17 @@ public class Autonomous_5220 extends OpMode_5220
 
     //AUTONOMOUS ONLY UTILITIES
 
-    /*private void shootAutonomousBalls()
+    private void shootAutonomousBalls()
     {
-        shoot();
-        moveDoor (DOOR_OPEN);
-        setSweeperPower(1.0);
-        sleep(600);
-        setSweeperPower(0);
+        shoot.mResume();
+        sleep(800);
+        moveDoor(DOOR_OPEN);
+        sleep(1200);
         moveDoor(DOOR_CLOSED);
-        shoot();
         sleep(100);
+        shoot.mSuspend();
     }
 
-    private void doubleShootAutonomousBalls()
-    {
-        shoot();
-        sleep(250);
-    }
-*/
 
     private void diagonalStrafeAgainstWall(boolean direction, double... params)
     {
@@ -664,7 +668,7 @@ public class Autonomous_5220 extends OpMode_5220
         */
 
         startToShootingPosition();
-        //shootAutonomousBalls();
+        shootAutonomousBalls();
         sleep(100);
         shootingPositionToWall();
         pushButtonsAlongWall();
@@ -681,6 +685,7 @@ public class Autonomous_5220 extends OpMode_5220
         }
 
         stopDrivetrain();
+        shoot.mStop();
     }
 
     public void main ()
@@ -698,7 +703,11 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         moveRackAndPinion(RP_RELEASE);
+        moveDoor(DOOR_OPEN);
+        moveDoor(DOOR_CLOSED);
         waitFullCycle();
+
+        shoot = new ShootThread();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

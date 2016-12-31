@@ -67,9 +67,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         super.initialize();
         g1Stick1Xinit = gamepad1.left_stick_x;
         g1Stick1Yinit = gamepad1.left_stick_y;
-        //color = ftcRCA.color;
-
         moveDoor(DOOR_CLOSED);
+        //color = ftcRCA.color;
     }
 
     //MAIN PROGRAM:
@@ -131,8 +130,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 double leftPower;
                 double rightPower;
 
-                double throttle = (-(gamepad1.left_stick_y - g1Stick1Yinit));
-                double direction = (gamepad1.left_stick_x - g1Stick1Xinit);
+                double throttle = ((gamepad1.left_stick_y - g1Stick1Yinit));
+                double direction = (-(gamepad1.left_stick_x - g1Stick1Xinit));
 
                 if (reverse) {
                     throttle = -throttle;
@@ -144,7 +143,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 rightPower = Range.clip(rightPower, -2, 2);
                 leftPower = Range.clip(leftPower, -2, 2);
 
-/* NOT USING DPAD FOR NOW
+                /* NOT USING DPAD FOR NOW
                 if ((leftPower < 15 && leftPower> -15) && (rightPower < 15 && rightPower > -15))
                 {
                     int powerVal = 15;
@@ -177,8 +176,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     double frontPower;
                     double backPower;
 
-                    throttle = (-(gamepad1.right_stick_y - g1Stick1Yinit));
-                    direction = (gamepad1.right_stick_x - g1Stick1Xinit);
+                    throttle = ((gamepad1.right_stick_y - g1Stick1Yinit));
+                    direction = ((gamepad1.right_stick_x - g1Stick1Xinit));
 
                     if (reverse) {
                         throttle = -throttle;
@@ -398,6 +397,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if (gamepad1.dpad_up) liftPower = 1.0;
                 else if (gamepad1.dpad_down) liftPower = -1.0;
                 else liftPower = 0;
+
+                if(gamepad1.dpad_right) moveHook(HOOK_RELEASE);
+                if(gamepad1.dpad_left) moveHook(HOOK_IN);
             }
 
             if (liftPower == 0)
@@ -408,6 +410,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             }
 
             setMotorPower(liftMotor, liftPower);
+
+            if(gamepad2.dpad_right) moveHook(HOOK_RELEASE);
+            if(gamepad2.dpad_left) moveHook(HOOK_IN);
 
             /*if ((gamepad1.dpad_left && dPadMode == DPAD_LIFT) || gamepad2.dpad_left) moveLiftTiltServo(LIFT_TILT_FORWARDS);
             else if ((gamepad1.dpad_right  && dPadMode == DPAD_LIFT) || gamepad2.dpad_right) moveLiftTiltServo(LIFT_TILT_BACKWARDS );

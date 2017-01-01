@@ -138,14 +138,15 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double LINE_WHITE_THRESHOLD = 28;
 
-    protected static final double DOOR_OPEN = 0.6;
+    protected static final double DOOR_OPEN = 0.5;
+    protected static final double DOOR_INIT = 0.8;
     protected static final double DOOR_CLOSED = 0.9;
 
     protected static final double RP_IN = 0.0;
-    protected static final double RP_RELEASE = 0.08;
+    protected static final double RP_RELEASE = 0.15;
     protected static final double RP_OUT = 0.4;
 
-    protected static final double HOOK_IN = 0.85;
+    protected static final double HOOK_IN = 0.92;
     protected static final double HOOK_RELEASE = 0.4;
 
     protected static final double ST_1 = 0.0;
@@ -217,6 +218,11 @@ public abstract class OpMode_5220 extends LinearOpMode
         leftBackMotor = hardwareMap.dcMotor.get("lb");
         rightBackMotor = hardwareMap.dcMotor.get("rb");
 
+        leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         //leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         //leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -259,7 +265,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     {
         moveRackAndPinion(RP_IN);
         moveHook(HOOK_IN);
-        //moveDoor(DOOR_CLOSED);
+        moveDoor(DOOR_INIT);
 
         waitFullCycle();
 /*

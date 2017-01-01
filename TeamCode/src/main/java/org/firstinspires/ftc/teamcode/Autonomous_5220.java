@@ -63,7 +63,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = RED; //arbitrary default
+    private boolean color = BLUE; //arbitrary default
     private int startPosition = START_RAMP;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private boolean firstBeacon = NEAR;
@@ -463,13 +463,14 @@ public class Autonomous_5220 extends OpMode_5220
         if(color == BLUE)
         {
             move(-7, 0.4);
-            rotateEncoder(-1.2);
+            rotateEncoder(-7.8);
+            move(-24, 0.4);
         }
 
         else if(color == RED)
         {
-            move(-7, 0.5);
-            rotateEncoder(0.3);
+            move(-7, 0.4);
+            rotateEncoder(7.8);
         }
     }
     
@@ -477,13 +478,30 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            //rotateEncoder(1.2);
-            //move(26);
+            move (-17.3, 0.5);
+            rotateEncoder(-32, 0.7);
+            strafeTime(800, 0.7);
+        }
 
-            rotateEncoder(11);
-            move (-51);
-            rotateEncoder(29.3);
-            strafeTime(1000, 0.7);
+        else if (color == RED)
+        {
+            //rotateEncoder(-0.3);
+            //move (26);
+
+            rotateEncoder(-12.5);
+            move(-44.7);
+            rotateEncoder(9.1);
+            strafeTime(1000, 0.5);
+        }
+    }
+
+    private void startToWall ()
+    {
+        if (color == BLUE)
+        {
+            move(-7, 0.4);
+            rotateEncoder(-9.2);
+            move(-11, 0.4);
         }
 
         else if (color == RED)
@@ -503,14 +521,14 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            diagonalStrafeAgainstWall(FORWARDS);
+            diagonalStrafeAgainstWall(FORWARDS, SLOW);
             while (runConditions() && colorSensorFront.blue() < 3) ;
             stopDrivetrain();
         }
 
         else if (color == RED)
         {
-            diagonalStrafeAgainstWall(BACKWARDS);
+            diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             while (runConditions() && colorSensorFront.red() < 2) ;
             stopDrivetrain();
         }
@@ -520,7 +538,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         moveRackAndPinion(RP_OUT);
         sleep(1500);
-        moveRackAndPinion(RP_IN);
+        moveRackAndPinion(RP_RELEASE);
         sleep(600);
     }
 
@@ -529,6 +547,11 @@ public class Autonomous_5220 extends OpMode_5220
         findButton();
 
         if(color == RED)
+        {
+            move(1.8);
+        }
+
+        if(color == BLUE)
         {
             move(1.8);
         }
@@ -574,17 +597,6 @@ public class Autonomous_5220 extends OpMode_5220
             strafe(-22);
             rotateEncoder(5.6);
             move(-55);
-
-            strafe(-19);
-            //rotateEncoder(5.6);
-            rotateEncoder(5.6);
-            move(-14);
-            sleep(1200);
-
-            //
-            // shoot();
-            sleep(250);
-            move(-47);
         }
         //programFinished = true;
 
@@ -703,7 +715,7 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         moveRackAndPinion(RP_RELEASE);
-        moveDoor(DOOR_OPEN);
+        sleep(800);
         moveDoor(DOOR_CLOSED);
         waitFullCycle();
 

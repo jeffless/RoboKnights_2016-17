@@ -177,7 +177,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     double backPower;
 
                     throttle = ((gamepad1.right_stick_y - g1Stick1Yinit));
-                    direction = ((gamepad1.right_stick_x - g1Stick1Xinit));
+                    direction = (-(gamepad1.right_stick_x - g1Stick1Xinit));
 
                     if (reverse) {
                         throttle = -throttle;
@@ -238,8 +238,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
             else
             {
-                double throttle = (-(gamepad1.left_stick_y - g1Stick1Yinit));
-                double direction = (gamepad1.left_stick_x - g1Stick1Xinit);
+                double throttle = ((gamepad1.left_stick_y - g1Stick1Yinit));
+                double direction = (-(gamepad1.left_stick_x - g1Stick1Xinit));
                 double strafe = (gamepad1.right_stick_x - g1Stick1Xinit);
 
                 theta = Math.toRadians(navX.getYaw());
@@ -350,7 +350,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if(shoot.isSuspended())
                 {
                     shoot.mResume();
-                    sleep(800);
+                    sleep(1200);
                     moveDoor(DOOR_OPEN);
                 }
 

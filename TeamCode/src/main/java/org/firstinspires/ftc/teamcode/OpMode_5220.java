@@ -140,10 +140,10 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double DOOR_OPEN = 0.5;
     protected static final double DOOR_INIT = 0.8;
-    protected static final double DOOR_CLOSED = 0.9;
+    protected static final double DOOR_CLOSED = 1.0;
 
     protected static final double RP_IN = 0.0;
-    protected static final double RP_RELEASE = 0.15;
+    protected static final double RP_RELEASE = 0.1;
     protected static final double RP_OUT = 0.4;
 
     protected static final double HOOK_IN = 0.92;

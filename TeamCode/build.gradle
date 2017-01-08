@@ -13,3 +13,9 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
+
+repositories {
+    flatDir {
+        dirs 'libs', 'C:\\navx-micro\\android\\libs'
+    }
+}

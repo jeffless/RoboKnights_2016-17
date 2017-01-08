@@ -58,6 +58,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.RunnableFuture;
 //hello!
 
 //TRY TO ADD METHODS FOR STRAFING DIAGONALLY (USING ONLY TWO WHEELS)
@@ -150,7 +151,9 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_RELEASE = 0.4;
 
     protected static final double CLAMP_IN = 1.0;
-    protected static final double CLAMP_DOWN = 0.6;
+    protected static final double CLAMP_DOWN = 0.93;
+
+    protected static double voltage = 0;
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
@@ -378,6 +381,8 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData("5", "Down: R = " + colorSensorDown.red() + ", G = " + colorSensorDown.green() + ", B = " + colorSensorDown.blue() + ", A = " +  colorSensorDown.alpha());
                 telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
+
+                telemetry.addData("8", "Voltage " + voltage);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1388,10 +1393,44 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        setMotorPower(flywheelLeft, 0.88);
-        setMotorPower(flywheelRight, 0.88);
+        if(voltage > 13.2)
+        {
+            setMotorPower(flywheelLeft, 0.45);
+            setMotorPower(flywheelRight, 0.45);
+        }
+        if((voltage > 12.8) && (voltage < 13.2))
+        {
+            setMotorPower(flywheelLeft, 0.65);
+            setMotorPower(flywheelRight, 0.65);
+        }
+
+        else if ((voltage > 12.5) && (voltage < 12.8))
+        {
+            setMotorPower(flywheelLeft, 0.85);
+            setMotorPower(flywheelRight, 0.85);
+        }
+
+        else if ((voltage > 12.3) && (voltage < 12.5))
+        {
+            setMotorPower(flywheelLeft, 0.88);
+            setMotorPower(flywheelRight, 0.88);
+        }
+
+        else if ((voltage > 11.0) && (voltage < 12.3))
+            setMotorPower(flywheelLeft, 0.9);
+            setMotorPower(flywheelRight, 0.9);
+        }
+
+        else
+        {
+            setMotorPower(flywheelLeft, 0.96);
+            setMotorPower(flywheelRight, 0.96);
+        }
+
         shooterRunning = true;
         shooterState = SHOOTER_ACTIVE;
+
+        sleep(200);
     }
 
     public final void stopShooting()
@@ -1413,6 +1452,7 @@ public abstract class OpMode_5220 extends LinearOpMode
             thrd = new Thread(this);
             suspended = true;
             stopped = false;
+            voltage = batteryVoltage();
             thrd.start();
         }
 
@@ -1452,6 +1492,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         synchronized void mResume ()
         {
             suspended = false;
+            voltage = batteryVoltage();
             notify();
         }
 
@@ -1522,7 +1563,22 @@ public abstract class OpMode_5220 extends LinearOpMode
         shoot.startShooting();
     }
     */
+    public double batteryVoltage()
+    {
+        return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+    }
 
+    public class BatteryThread implements Runnable
+    {
+        public void run()
+        {
+            /*while(runConditions())
+            {
+                voltage = batteryVoltage();
+                sleep(5000);
+            }*/
+        }
+    }
 
     public double getFloorBrightness ()
     {

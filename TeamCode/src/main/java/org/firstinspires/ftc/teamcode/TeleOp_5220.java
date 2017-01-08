@@ -134,7 +134,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 double direction = (-(gamepad1.left_stick_x - g1Stick1Xinit));
 
                 if (reverse) {
-                    throttle = -throttle;
+                    direction = -direction;
                 }
 
                 rightPower = throttle - direction;
@@ -179,9 +179,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     throttle = ((gamepad1.right_stick_y - g1Stick1Yinit));
                     direction = (-(gamepad1.right_stick_x - g1Stick1Xinit));
 
-                    if (reverse) {
-                        throttle = -throttle;
-                    }
+                    /*if (reverse) {
+                        direction = -direction;
+                    }*/
 
                     backPower = throttle - direction; //SWITCH THESE AROUND IF THIS ENDS UP BEING THE WRONG WAY
                     frontPower = throttle + direction;
@@ -387,7 +387,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             if ((gamepad1.b && !prevGamepad1.b) || (gamepad2.b && !prevGamepad2.b))
                 moveDoor(doorServo.getPosition() != DOOR_OPEN ? DOOR_OPEN : DOOR_CLOSED);
 
-            if ((gamepad1.y && !prevGamepad1.y) || (gamepad2.start && !prevGamepad2.start))
+            if ((gamepad1.y && !prevGamepad1.y) || (gamepad2.y && !prevGamepad2.y))
                 moveRackAndPinion(autoExtendServo.getPosition() != RP_IN ? RP_IN : RP_OUT);
 
             double liftPower = 0;
@@ -495,6 +495,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         shoot.start();*/
 
         shoot = new ShootThread();
+        new Thread(new BatteryThread()).start();
 
         while (runConditions())
         {

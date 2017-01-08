@@ -63,7 +63,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = BLUE; //arbitrary default
+    private boolean color = RED; //arbitrary default
     private int startPosition = START_RAMP;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private boolean firstBeacon = NEAR;
@@ -461,8 +461,8 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-7, 0.4);
-            rotateEncoder(-8.2);
+            move(-4, 0.4);
+            rotateEncoder(-8.9);
             move(-25.3, 0.6);
         }
 
@@ -470,7 +470,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             move(-4, 0.4);
             rotateEncoder(-27.4);
-            move(22.3, 0.6);
+            move(19.8, 0.6);
         }
     }
 
@@ -488,7 +488,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            move(10, 0.5);
+            move(12, 0.5);
             rotateEncoder(24.3, 0.7);
             move(-3);
 
@@ -522,14 +522,14 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            diagonalStrafeAgainstWall(FORWARDS, SLOW);
+            diagonalStrafeAgainstWall(FORWARDS);
             while (runConditions() && colorSensorFront.blue() < 3) ;
             stopDrivetrain();
         }
 
         else if (color == RED)
         {
-            diagonalStrafeAgainstWall(BACKWARDS, SLOW);
+            diagonalStrafeAgainstWall(BACKWARDS);
             while (runConditions() && colorSensorFront.red() < 2) ;
             stopDrivetrain();
         }
@@ -621,7 +621,7 @@ public class Autonomous_5220 extends OpMode_5220
         else if (color == RED)
         {
             strafe (-17);
-            rotateEncoder(4.2);
+            rotateEncoder(4.6);
             move(52);
         }
         setSweeperPower(0.0);
@@ -728,6 +728,7 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         shoot = new ShootThread();
+        new Thread(new BatteryThread()).start();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

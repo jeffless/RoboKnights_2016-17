@@ -116,8 +116,18 @@ public class FlywheelTest extends LinearOpMode
             //calculateTBH();
             //sleep(100);
             //setFPower(.79);
-            setFPower(.90);
-            sleep(100);
+            doorServo.setPosition(0.5);
+            double voltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+            if(voltage < 12.0)
+            {
+                setFPower(.94);
+            }
+
+            else
+            {
+                setFPower(.88);
+            }
+            printVoltage();
         }
     }
 
@@ -284,5 +294,13 @@ public class FlywheelTest extends LinearOpMode
         {
             place *= 0.1;
         }
+    }
+
+    public void printVoltage()
+    {
+        double voltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+        telemetry.addData("1", "Voltage " + voltage);
+        telemetry.update();
+        sleep(200);
     }
 }

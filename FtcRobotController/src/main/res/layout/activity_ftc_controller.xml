@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <RelativeLayout
     android:id="@+id/top_bar"
     android:layout_width="fill_parent"
-    android:layout_height="80dp"
+    android:layout_height="93dp"
     android:background="@color/black">
 
     <ImageView
@@ -53,17 +53,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:layout_width="wrap_content"
       android:layout_height="fill_parent"
       android:adjustViewBounds="true"
-      android:layout_margin="1dp"/>
+      android:layout_marginLeft="1dp"
+      android:layout_marginRight="1dp"
+      android:layout_marginTop="11dp"
+      android:layout_marginBottom="1dp"/>
 
     <TextView
       android:id="@+id/textDeviceName"
-      android:layout_toEndOf="@id/robotIcon"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textColor="@color/white"
       android:textAppearance="?android:attr/textAppearanceMedium"
-      android:padding="8dp"
-      android:textStyle="bold"/>
+      android:padding="1dp"
+      android:textStyle="bold"
+      android:layout_alignParentTop="true"
+      android:layout_alignEnd="@+id/robotIcon"
+      android:gravity="top|center_horizontal"/>
 
     <ImageButton
       android:id="@+id/menu_buttons"
@@ -72,12 +77,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:layout_height="wrap_content"
       android:src="@drawable/icon_menu"
       android:background="@color/black"
-      android:padding="15dp"
       android:adjustViewBounds="true"
       android:layout_alignParentEnd="true"
-      android:layout_centerInParent="true"
-      android:layout_centerHorizontal="true"
-      android:layout_margin="10dp"/>
+      android:layout_marginLeft="0dp"
+      android:layout_marginRight="0dp"
+      android:layout_marginBottom="0dp"
+      android:layout_alignTop="@id/robotIcon"
+      android:layout_marginTop="11dp"  />
 
   </RelativeLayout>
   <!-- end of black bar -->

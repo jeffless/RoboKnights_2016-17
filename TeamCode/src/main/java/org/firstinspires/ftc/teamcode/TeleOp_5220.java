@@ -397,9 +397,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if (gamepad1.dpad_up) liftPower = 1.0;
                 else if (gamepad1.dpad_down) liftPower = -1.0;
                 else liftPower = 0;
-
-                if(gamepad1.dpad_right) moveHook(HOOK_RELEASE);
-                if(gamepad1.dpad_left) moveHook(HOOK_IN);
             }
 
             if (liftPower == 0)
@@ -411,8 +408,15 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
             setMotorPower(liftMotor, liftPower);
 
-            if(gamepad2.dpad_right) moveHook(HOOK_RELEASE);
-            if(gamepad2.dpad_left) moveHook(HOOK_IN);
+            if ((gamepad1.dpad_right && !prevGamepad1.dpad_right) || (gamepad2.dpad_right && !prevGamepad2.dpad_right))
+            {
+                moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
+            }
+
+            if ((gamepad1.dpad_left && !prevGamepad1.dpad_left) || (gamepad2.dpad_left && !prevGamepad2.dpad_left))
+            {
+                moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
+            }
 
             /*if ((gamepad1.dpad_left && dPadMode == DPAD_LIFT) || gamepad2.dpad_left) moveLiftTiltServo(LIFT_TILT_FORWARDS);
             else if ((gamepad1.dpad_right  && dPadMode == DPAD_LIFT) || gamepad2.dpad_right) moveLiftTiltServo(LIFT_TILT_BACKWARDS );

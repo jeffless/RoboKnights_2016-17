@@ -149,6 +149,9 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_IN = 0.92;
     protected static final double HOOK_RELEASE = 0.4;
 
+    protected static final double CLAMP_IN = 1.0;
+    protected static final double CLAMP_DOWN = 0.6;
+
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
 
@@ -171,7 +174,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected Servo doorServo;
     protected Servo autoExtendServo;
-
+    protected Servo clampServo;
     protected Servo hookServo;
 
     //SENSORS:
@@ -250,6 +253,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         doorServo = hardwareMap.servo.get ("dServo");
         autoExtendServo = hardwareMap.servo.get("rpServo");
         hookServo = hardwareMap.servo.get("hServo");
+        clampServo = hardwareMap.servo.get("cServo");
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
@@ -266,6 +270,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         moveRackAndPinion(RP_IN);
         moveHook(HOOK_IN);
         moveDoor(DOOR_INIT);
+        moveBallClamp(CLAMP_IN);
 
         waitFullCycle();
 /*
@@ -1360,6 +1365,11 @@ public abstract class OpMode_5220 extends LinearOpMode
     public final void moveRackAndPinion (double position)
     {
         autoExtendServo.setPosition(position);
+    }
+
+    public final void moveBallClamp(double position)
+    {
+        clampServo.setPosition(position);
     }
 
     public final boolean isBallLoaded () //use sensor soon

@@ -728,7 +728,6 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         shoot = new ShootThread();
-        new Thread(new BatteryThread()).start();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

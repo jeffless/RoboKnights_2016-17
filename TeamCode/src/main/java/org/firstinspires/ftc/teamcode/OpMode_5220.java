@@ -1417,6 +1417,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         }
 
         else if ((voltage > 11.0) && (voltage < 12.3))
+        {
             setMotorPower(flywheelLeft, 0.9);
             setMotorPower(flywheelRight, 0.9);
         }
@@ -1566,18 +1567,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     public double batteryVoltage()
     {
         return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
-    }
-
-    public class BatteryThread implements Runnable
-    {
-        public void run()
-        {
-            /*while(runConditions())
-            {
-                voltage = batteryVoltage();
-                sleep(5000);
-            }*/
-        }
     }
 
     public double getFloorBrightness ()

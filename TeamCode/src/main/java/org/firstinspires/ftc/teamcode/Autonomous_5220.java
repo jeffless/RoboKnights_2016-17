@@ -69,6 +69,7 @@ public class Autonomous_5220 extends OpMode_5220
     private boolean firstBeacon = NEAR;
     private boolean secondBeaconOn = true;
     private int endPath = END_BALL;
+    private boolean shootOnly = false;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -103,10 +104,11 @@ public class Autonomous_5220 extends OpMode_5220
         private static final int FIRST_BEACON = 3;
         private static final int SECOND_BEACON_ON = 4;
         private static final int PATH = 5;
-        private static final int COLLECTOR = 6;
+        private static final int SHOOT_ONLY = 6;
+        private static final int COLLECTOR = 7;
 
 
-        private static final int NUM_SETTINGS = 7; //always make sure this is correct.
+        private static final int NUM_SETTINGS = 8; //always make sure this is correct.
 
         private int currentSetting = 0;
 
@@ -122,6 +124,7 @@ public class Autonomous_5220 extends OpMode_5220
             telemetryLines[FIRST_BEACON] = ("First Beacon Choice: " + ((firstBeacon == NEAR) ? "NEAR" : "FAR"));
             telemetryLines[SECOND_BEACON_ON] = ("Second Beacon Scoring: " + (secondBeaconOn ? "ON" : "OFF"));
             telemetryLines[PATH] = (endPathToString(endPath));
+            telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (runCollector ? "ON" : "OFF"));
             telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
             writeLinesToTelemetry();
 
@@ -256,6 +259,11 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 endPath = (endPath + direction) % NUM_STARTS;
                 telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
+            }
+                        else if (setting == SHOOT_ONLY)
+            {
+                shootOnly = !shootOnly;
+                telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (shootOnly ? "ON" : "OFF"));
             }
 
             else if (setting == COLLECTOR)
@@ -681,26 +689,46 @@ public class Autonomous_5220 extends OpMode_5220
 
     public void autonomous ()
     {
-        startToShootingPosition();
-        shootAutonomousBalls();
-        sleep(100);
-        shootingPositionToWall();
-        pushButtonsAlongWall();
-
-        if(endPath == END_BLOCK)
+        if(shootOnly)
         {
-            farBeaconToOpponent();
+            if(color == BLUE)
+            {
+                strafe(-18);
+            }
+
+            else if (color == RED)
+            {
+                strafe(18);
+            }
+
+            startToShootingPosition();
+            shootAutonomousBalls();
+            sleep(100);
         }
 
-        else if(endPath == END_BALL)
+        else
         {
-            alignWithFarLine();
-            farBeaconToBall();
+            startToShootingPosition();
+            shootAutonomousBalls();
+            sleep(100);
+            shootingPositionToWall();
+            pushButtonsAlongWall();
 
-            if(runCollector)
+            if (endPath == END_BLOCK)
             {
-                ballToShooting();
-                shootAutonomousBalls();
+                farBeaconToOpponent();
+            }
+
+            else if (endPath == END_BALL)
+            {
+                alignWithFarLine();
+                farBeaconToBall();
+
+                if (runCollector)
+                {
+                    ballToShooting();
+                    shootAutonomousBalls();
+                }
             }
         }
 

@@ -467,6 +467,22 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void startToShootingPosition()
     {
+        if(startPosition == START_CORNER)
+        {
+            if(color == BLUE)
+            {
+                move(-1);
+                strafe(-34.2, 0.8);
+                move(3);
+            }
+
+            else if (color == RED)
+            {
+                move(-1);
+                strafe(30, 0.8);
+                move(3);
+            }
+        }
         if(color == BLUE)
         {
             move(-4, 0.4);
@@ -487,10 +503,10 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == BLUE)
         {
             move (-17.3, 0.5);
-            rotateEncoder(-32, 0.7);
+            rotateEncoder(-30.0, 0.7);
             strafeTime(800, 0.7);
-            diagonalStrafeAgainstWall(BACKWARDS);
-            sleep(800);
+            //diagonalStrafeAgainstWall(BACKWARDS);
+            //sleep(800);
             stopDrivetrain();
         }
 
@@ -499,8 +515,8 @@ public class Autonomous_5220 extends OpMode_5220
             move(12, 0.5);
             rotateEncoder(24.3, 0.7);
             move(-3);
-
             strafeTime(1000, 0.7);
+            stopDrivetrain();
         }
     }
 
@@ -622,15 +638,15 @@ public class Autonomous_5220 extends OpMode_5220
         {
             strafe(-17.3);
             rotateEncoder(-4.2);
-            move(-52);
+            move(-50);
         }
         //programFinished = true;
 
         else if (color == RED)
         {
-            strafe (-17);
+            strafe (-16.5);
             rotateEncoder(4.6);
-            move(52);
+            move(50);
         }
         setSweeperPower(0.0);
     }
@@ -644,7 +660,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         if(color == RED)
         {
-            strafe (-34.2);
+            strafe (-32.2);
             move(-3);
         }
     }
@@ -693,12 +709,16 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                strafe(-18);
+                move(-1);
+                strafe(-34.2, 0.8);
+                move(3);
             }
 
             else if (color == RED)
             {
-                strafe(18);
+                move(-1);
+                strafe(30, 0.8);
+                move(3);
             }
 
             startToShootingPosition();

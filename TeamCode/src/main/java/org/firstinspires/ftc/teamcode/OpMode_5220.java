@@ -1393,7 +1393,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        if(voltage > 13.2)
+        /*if(voltage > 13.2)
         {
             setMotorPower(flywheelLeft, 0.45);
             setMotorPower(flywheelRight, 0.45);
@@ -1431,15 +1431,16 @@ public abstract class OpMode_5220 extends LinearOpMode
         shooterRunning = true;
         shooterState = SHOOTER_ACTIVE;
 
-        sleep(200);
+        sleep(200); */
 
-        /*double targetVoltage = 12.5;
-        double kP = .15;
+        double targetVoltage = 12.5;
+        double kP = .18;
         double error = targetVoltage - voltage;
-        double motorOut = (error * kP) + .88;
+        double motorOut = (error * kP) + .82;
         motorOut = Range.clip(motorOut, 0, 1);
         setMotorPower(flywheelLeft, motorOut);
-        setMotorPower(flywheelRight, motorOut); */
+        setMotorPower(flywheelRight, motorOut);
+        sleep(200);
     }
 
     public final void stopShooting()
@@ -1503,8 +1504,8 @@ public abstract class OpMode_5220 extends LinearOpMode
             suspended = false;
             voltage = batteryVoltage();
             notify();
-            sleep(1200);
-            moveDoor(DOOR_OPEN);
+            /*sleep(1200);
+            moveDoor(DOOR_OPEN);*/
         }
 
         public boolean isSuspended()

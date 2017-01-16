@@ -153,7 +153,12 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double CLAMP_IN = 1.0;
     protected static final double CLAMP_DOWN = 0.93;
 
-    protected static double voltage = 0;
+    protected static final double TARGET_VOLTAGE = 12.5;
+    protected static final double TARGET_SPEED = 7.5e-7;
+
+    protected static final double kP = 0.18;
+    protected static final double kI = 0.0;
+    protected static final double kD = 0.0;
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
@@ -206,6 +211,13 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
     public static boolean shooterRunning = false;
+
+    protected static double voltage = 0;
+    protected static double speed = 0;
+    protected static double integral = 0;
+    protected static double lastError;
+    protected static double lastTime;
+    protected static double lastEncoder;
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
@@ -1393,54 +1405,25 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        /*if(voltage > 13.2)
-        {
-            setMotorPower(flywheelLeft, 0.45);
-            setMotorPower(flywheelRight, 0.45);
-        }
-        if((voltage > 12.8) && (voltage < 13.2))
-        {
-            setMotorPower(flywheelLeft, 0.65);
-            setMotorPower(flywheelRight, 0.65);
-        }
-
-        else if ((voltage > 12.5) && (voltage < 12.8))
-        {
-            setMotorPower(flywheelLeft, 0.85);
-            setMotorPower(flywheelRight, 0.85);
-        }
-
-        else if ((voltage > 12.3) && (voltage < 12.5))
-        {
-            setMotorPower(flywheelLeft, 0.88);
-            setMotorPower(flywheelRight, 0.88);
-        }
-
-        else if ((voltage > 11.0) && (voltage < 12.3))
-        {
-            setMotorPower(flywheelLeft, 0.9);
-            setMotorPower(flywheelRight, 0.9);
-        }
-
-        else
-        {
-            setMotorPower(flywheelLeft, 0.96);
-            setMotorPower(flywheelRight, 0.96);
-        }
-
-        shooterRunning = true;
-        shooterState = SHOOTER_ACTIVE;
-
-        sleep(200); */
-
-        double targetVoltage = 12.5;
-        double kP = .18;
-        double error = targetVoltage - voltage;
+        double error = TARGET_VOLTAGE - voltage;
         double motorOut = (error * kP) + .82;
         motorOut = Range.clip(motorOut, 0, 1);
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);
         sleep(200);
+
+        /*
+        double error = TARGET_SPEED - flywheelSpeed();
+        double derivative = error - lastError;
+        integral += error;
+        lastError = error;
+
+        double motorOut = (kP * error) + (kI * integral) + (kD * derivative) + .86;
+        motorOut = Range.clip(motorOut, 0.0, 1.0);
+        setMotorPower(flywheelLeft, motorOut);
+        setMotorPower(flywheelRight, motorOut);
+        sleep(200);
+        */
     }
 
     public final void stopShooting()
@@ -1503,9 +1486,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             suspended = false;
             voltage = batteryVoltage();
+            integral = 0;
             notify();
-            /*sleep(1200);
-            moveDoor(DOOR_OPEN);*/
         }
 
         public boolean isSuspended()
@@ -1578,6 +1560,18 @@ public abstract class OpMode_5220 extends LinearOpMode
     public double batteryVoltage()
     {
         return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+    }
+
+    public double flywheelSpeed()
+    {
+        long time = System.nanoTime();
+        long encoder = flywheelRight.getCurrentPosition();
+        double speed = (encoder - lastEncoder) / (time - lastTime);
+
+        lastEncoder = encoder;
+        lastTime = time;
+
+        return speed;
     }
 
     public double getFloorBrightness ()

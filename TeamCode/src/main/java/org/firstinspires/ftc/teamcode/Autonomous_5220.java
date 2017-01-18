@@ -335,7 +335,7 @@ public class Autonomous_5220 extends OpMode_5220
     private void shootAutonomousBalls()
     {
         shoot.mResume();
-        sleep(800);
+        sleep(1200);
         moveDoor(DOOR_OPEN);
         sleep(1200);
         moveDoor(DOOR_CLOSED);
@@ -722,6 +722,7 @@ public class Autonomous_5220 extends OpMode_5220
             }
 
             startToShootingPosition();
+            sleep(200);
             shootAutonomousBalls();
             sleep(100);
         }
@@ -729,6 +730,7 @@ public class Autonomous_5220 extends OpMode_5220
         else
         {
             startToShootingPosition();
+            sleep(200);
             shootAutonomousBalls();
             sleep(100);
             shootingPositionToWall();

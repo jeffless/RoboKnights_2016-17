@@ -63,12 +63,13 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = BLUE; //arbitrary default
+    private boolean color = RED; //arbitrary default
     private int startPosition = START_RAMP;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private boolean firstBeacon = NEAR;
     private boolean secondBeaconOn = true;
     private int endPath = END_BALL;
+    private boolean shootOnly = false;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -103,10 +104,11 @@ public class Autonomous_5220 extends OpMode_5220
         private static final int FIRST_BEACON = 3;
         private static final int SECOND_BEACON_ON = 4;
         private static final int PATH = 5;
-        private static final int COLLECTOR = 6;
+        private static final int SHOOT_ONLY = 6;
+        private static final int COLLECTOR = 7;
 
 
-        private static final int NUM_SETTINGS = 7; //always make sure this is correct.
+        private static final int NUM_SETTINGS = 8; //always make sure this is correct.
 
         private int currentSetting = 0;
 
@@ -122,6 +124,7 @@ public class Autonomous_5220 extends OpMode_5220
             telemetryLines[FIRST_BEACON] = ("First Beacon Choice: " + ((firstBeacon == NEAR) ? "NEAR" : "FAR"));
             telemetryLines[SECOND_BEACON_ON] = ("Second Beacon Scoring: " + (secondBeaconOn ? "ON" : "OFF"));
             telemetryLines[PATH] = (endPathToString(endPath));
+            telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (runCollector ? "ON" : "OFF"));
             telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
             writeLinesToTelemetry();
 
@@ -257,6 +260,11 @@ public class Autonomous_5220 extends OpMode_5220
                 endPath = (endPath + direction) % NUM_STARTS;
                 telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
             }
+                        else if (setting == SHOOT_ONLY)
+            {
+                shootOnly = !shootOnly;
+                telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (shootOnly ? "ON" : "OFF"));
+            }
 
             else if (setting == COLLECTOR)
             {
@@ -327,7 +335,7 @@ public class Autonomous_5220 extends OpMode_5220
     private void shootAutonomousBalls()
     {
         shoot.mResume();
-        sleep(800);
+        sleep(1200);
         moveDoor(DOOR_OPEN);
         sleep(1200);
         moveDoor(DOOR_CLOSED);
@@ -459,10 +467,26 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void startToShootingPosition()
     {
+        if(startPosition == START_CORNER)
+        {
+            if(color == BLUE)
+            {
+                move(-1);
+                strafe(-35.3, 0.8);
+                move(3);
+            }
+
+            else if (color == RED)
+            {
+                move(-1);
+                strafe(30, 0.8);
+                move(3);
+            }
+        }
         if(color == BLUE)
         {
-            move(-7, 0.4);
-            rotateEncoder(-8.2);
+            move(-4, 0.4);
+            rotateEncoder(-10.5);
             move(-25.3, 0.6);
         }
 
@@ -470,7 +494,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             move(-4, 0.4);
             rotateEncoder(-27.4);
-            move(22.3, 0.6);
+            move(19.8, 0.6);
         }
     }
 
@@ -479,7 +503,7 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == BLUE)
         {
             move (-17.3, 0.5);
-            rotateEncoder(-32, 0.7);
+            rotateEncoder(-30.0, 0.7);
             strafeTime(800, 0.7);
             diagonalStrafeAgainstWall(BACKWARDS);
             sleep(800);
@@ -488,11 +512,11 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            move(10, 0.5);
+            move(12, 0.5);
             rotateEncoder(24.3, 0.7);
             move(-3);
-
             strafeTime(1000, 0.7);
+            stopDrivetrain();
         }
     }
 
@@ -522,14 +546,14 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            diagonalStrafeAgainstWall(FORWARDS, SLOW);
+            diagonalStrafeAgainstWall(FORWARDS);
             while (runConditions() && colorSensorFront.blue() < 3) ;
             stopDrivetrain();
         }
 
         else if (color == RED)
         {
-            diagonalStrafeAgainstWall(BACKWARDS, SLOW);
+            diagonalStrafeAgainstWall(BACKWARDS);
             while (runConditions() && colorSensorFront.red() < 2) ;
             stopDrivetrain();
         }
@@ -614,15 +638,15 @@ public class Autonomous_5220 extends OpMode_5220
         {
             strafe(-17.3);
             rotateEncoder(-4.2);
-            move(-52);
+            move(-50);
         }
         //programFinished = true;
 
         else if (color == RED)
         {
-            strafe (-17);
-            rotateEncoder(4.2);
-            move(52);
+            strafe (-16.5);
+            rotateEncoder(4.6);
+            move(50);
         }
         setSweeperPower(0.0);
     }
@@ -636,7 +660,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         if(color == RED)
         {
-            strafe (-34.2);
+            strafe (-32.2);
             move(-3);
         }
     }
@@ -681,26 +705,52 @@ public class Autonomous_5220 extends OpMode_5220
 
     public void autonomous ()
     {
-        startToShootingPosition();
-        shootAutonomousBalls();
-        sleep(100);
-        shootingPositionToWall();
-        pushButtonsAlongWall();
-
-        if(endPath == END_BLOCK)
+        if(shootOnly)
         {
-            farBeaconToOpponent();
+            if(color == BLUE)
+            {
+                move(-1);
+                strafe(-34.2, 0.8);
+                move(3);
+            }
+
+            else if (color == RED)
+            {
+                move(-1);
+                strafe(30, 0.8);
+                move(3);
+            }
+
+            startToShootingPosition();
+            sleep(200);
+            shootAutonomousBalls();
+            sleep(100);
         }
 
-        else if(endPath == END_BALL)
+        else
         {
-            alignWithFarLine();
-            farBeaconToBall();
+            startToShootingPosition();
+            sleep(200);
+            shootAutonomousBalls();
+            sleep(100);
+            shootingPositionToWall();
+            pushButtonsAlongWall();
 
-            if(runCollector)
+            if (endPath == END_BLOCK)
             {
-                ballToShooting();
-                shootAutonomousBalls();
+                farBeaconToOpponent();
+            }
+
+            else if (endPath == END_BALL)
+            {
+                alignWithFarLine();
+                farBeaconToBall();
+
+                if (runCollector)
+                {
+                    ballToShooting();
+                    shootAutonomousBalls();
+                }
             }
         }
 

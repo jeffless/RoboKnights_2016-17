@@ -81,6 +81,9 @@ public class FlywheelTest extends LinearOpMode
 
     private double tolerance = 0.5e-7;
 
+    private double targetVoltage = 12.5;
+    private double voltage;
+
     private static final String TAG = "MyActivity";
 
     public void runOpMode ()
@@ -112,12 +115,7 @@ public class FlywheelTest extends LinearOpMode
         }
         while (opModeIsActive())
         {
-            //bangBang();
-            //calculateTBH();
-            //sleep(100);
-            //setFPower(.79);
-            setFPower(.90);
-            sleep(100);
+
         }
     }
 
@@ -176,26 +174,6 @@ public class FlywheelTest extends LinearOpMode
         fLastError = fError;
 
         setFPower(motorOut );
-
-        /*integral += fError;
-        motorOut = integral * tbhI;
-        Range.clip(motorOut, 0, 1);
-
-        if(Math.signum(fError) != Math.signum(fLastError))
-        {
-            if(firstCross)
-            {
-                motorOut = .3;
-                firstCross = false;
-            }
-            else
-            {
-                tbh = (motorOut + tbh) / 2;
-                motorOut = tbh;
-            }
-            fLastError = fError;
-        }
-        return motorOut; */
     }
 
     private void calculatePID()
@@ -284,5 +262,28 @@ public class FlywheelTest extends LinearOpMode
         {
             place *= 0.1;
         }
+    }
+
+    public void printVoltage()
+    {
+        double voltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+        telemetry.addData("1", "Voltage " + voltage);
+        telemetry.update();
+        sleep(200);
+    }
+
+
+    public double batteryVoltage()
+    {
+        return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+    }
+
+    public void voltageProportional()
+    {
+        double kP = .15;
+        double error = targetVoltage - voltage;
+        motorOut = (error * kP) + .88;
+        motorOut = Range.clip(motorOut, 0, 1);
+        setFPower(motorOut);
     }
 }

@@ -134,7 +134,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 double direction = (-(gamepad1.left_stick_x - g1Stick1Xinit));
 
                 if (reverse) {
-                    throttle = -throttle;
+                    direction = -direction;
                 }
 
                 rightPower = throttle - direction;
@@ -179,9 +179,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     throttle = ((gamepad1.right_stick_y - g1Stick1Yinit));
                     direction = (-(gamepad1.right_stick_x - g1Stick1Xinit));
 
-                    if (reverse) {
-                        throttle = -throttle;
-                    }
+                    /*if (reverse) {
+                        direction = -direction;
+                    }*/
 
                     backPower = throttle - direction; //SWITCH THESE AROUND IF THIS ENDS UP BEING THE WRONG WAY
                     frontPower = throttle + direction;
@@ -350,8 +350,10 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if(shoot.isSuspended())
                 {
                     shoot.mResume();
+
                     sleep(1200);
                     moveDoor(DOOR_OPEN);
+
                 }
 
                 else
@@ -387,7 +389,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             if ((gamepad1.b && !prevGamepad1.b) || (gamepad2.b && !prevGamepad2.b))
                 moveDoor(doorServo.getPosition() != DOOR_OPEN ? DOOR_OPEN : DOOR_CLOSED);
 
-            if ((gamepad1.y && !prevGamepad1.y) || (gamepad2.start && !prevGamepad2.start))
+            if ((gamepad1.y && !prevGamepad1.y) || (gamepad2.y && !prevGamepad2.y))
                 moveRackAndPinion(autoExtendServo.getPosition() != RP_IN ? RP_IN : RP_OUT);
 
             double liftPower = 0;
@@ -397,6 +399,16 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if (gamepad1.dpad_up) liftPower = 1.0;
                 else if (gamepad1.dpad_down) liftPower = -1.0;
                 else liftPower = 0;
+
+                if ((gamepad1.dpad_right && !prevGamepad1.dpad_right))
+                {
+                    moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
+                }
+
+                if ((gamepad1.dpad_left && !prevGamepad1.dpad_left))
+                {
+                    moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
+                }
             }
 
             if (liftPower == 0)
@@ -404,19 +416,20 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 if (gamepad2.dpad_up) liftPower = 1.0;
                 else if (gamepad2.dpad_down) liftPower = -1.0;
                 else liftPower = 0;
+
+                if ((gamepad2.dpad_right && !prevGamepad2.dpad_right))
+                {
+                    moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
+                }
+
+                if ((gamepad2.dpad_left && !prevGamepad2.dpad_left))
+                {
+                    moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
+                }
             }
 
             setMotorPower(liftMotor, liftPower);
 
-            if ((gamepad1.dpad_right && !prevGamepad1.dpad_right) || (gamepad2.dpad_right && !prevGamepad2.dpad_right))
-            {
-                moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
-            }
-
-            if ((gamepad1.dpad_left && !prevGamepad1.dpad_left) || (gamepad2.dpad_left && !prevGamepad2.dpad_left))
-            {
-                moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
-            }
 
             /*if ((gamepad1.dpad_left && dPadMode == DPAD_LIFT) || gamepad2.dpad_left) moveLiftTiltServo(LIFT_TILT_FORWARDS);
             else if ((gamepad1.dpad_right  && dPadMode == DPAD_LIFT) || gamepad2.dpad_right) moveLiftTiltServo(LIFT_TILT_BACKWARDS );

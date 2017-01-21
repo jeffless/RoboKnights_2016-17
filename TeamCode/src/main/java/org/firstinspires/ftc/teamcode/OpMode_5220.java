@@ -58,6 +58,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.RunnableFuture;
 //hello!
 
 //TRY TO ADD METHODS FOR STRAFING DIAGONALLY (USING ONLY TWO WHEELS)
@@ -150,7 +151,14 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_RELEASE = 0.4;
 
     protected static final double CLAMP_IN = 1.0;
-    protected static final double CLAMP_DOWN = 0.6;
+    protected static final double CLAMP_DOWN = 0.93;
+
+    protected static final double TARGET_VOLTAGE = 12.5;
+    protected static final double TARGET_SPEED = 7.5e-7;
+
+    protected static final double kP = 0.18;
+    protected static final double kI = 0.0;
+    protected static final double kD = 0.0;
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
@@ -203,6 +211,13 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
     public static boolean shooterRunning = false;
+
+    protected static double voltage = 0;
+    protected static double speed = 0;
+    protected static double integral = 0;
+    protected static double lastError;
+    protected static double lastTime;
+    protected static double lastEncoder;
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
@@ -378,6 +393,8 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData("5", "Down: R = " + colorSensorDown.red() + ", G = " + colorSensorDown.green() + ", B = " + colorSensorDown.blue() + ", A = " +  colorSensorDown.alpha());
                 telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
+
+                telemetry.addData("8", "Voltage " + voltage);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1388,10 +1405,25 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
-        setMotorPower(flywheelLeft, 0.88);
-        setMotorPower(flywheelRight, 0.88);
-        shooterRunning = true;
-        shooterState = SHOOTER_ACTIVE;
+        double error = TARGET_VOLTAGE - voltage;
+        double motorOut = (error * kP) + .82;
+        motorOut = Range.clip(motorOut, 0, 1);
+        setMotorPower(flywheelLeft, motorOut);
+        setMotorPower(flywheelRight, motorOut);
+        sleep(200);
+
+        /*
+        double error = TARGET_SPEED - flywheelSpeed();
+        double derivative = error - lastError;
+        integral += error;
+        lastError = error;
+
+        double motorOut = (kP * error) + (kI * integral) + (kD * derivative) + .86;
+        motorOut = Range.clip(motorOut, 0.0, 1.0);
+        setMotorPower(flywheelLeft, motorOut);
+        setMotorPower(flywheelRight, motorOut);
+        sleep(200);
+        */
     }
 
     public final void stopShooting()
@@ -1413,6 +1445,7 @@ public abstract class OpMode_5220 extends LinearOpMode
             thrd = new Thread(this);
             suspended = true;
             stopped = false;
+            voltage = batteryVoltage();
             thrd.start();
         }
 
@@ -1452,6 +1485,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         synchronized void mResume ()
         {
             suspended = false;
+            voltage = batteryVoltage();
+            integral = 0;
             notify();
         }
 
@@ -1522,7 +1557,22 @@ public abstract class OpMode_5220 extends LinearOpMode
         shoot.startShooting();
     }
     */
+    public double batteryVoltage()
+    {
+        return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+    }
 
+    public double flywheelSpeed()
+    {
+        long time = System.nanoTime();
+        long encoder = flywheelRight.getCurrentPosition();
+        double speed = (encoder - lastEncoder) / (time - lastTime);
+
+        lastEncoder = encoder;
+        lastTime = time;
+
+        return speed;
+    }
 
     public double getFloorBrightness ()
     {

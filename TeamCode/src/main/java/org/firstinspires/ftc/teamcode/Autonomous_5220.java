@@ -47,32 +47,25 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class Autonomous_5220 extends OpMode_5220
 {
-    public static final int START_RAMP = 0;
-    public static final int START_CORNER = 1;
-    public static final int START_STRAIGHT = 2;
-    public static final int NUM_STARTS = 3;
+    public static final int START_NORMAL = 0;
+    public static final int START_SHOOT_ONLY = 1;
+    public static final int NUM_STARTS = 2;
 
     public static final int END_BALL = 0;
     public static final int END_BLOCK = 1;
-    public static final int NUM_ENDS = 2;
-
-    public double linePATHedTime = 19500;
-    private boolean linePATHed = false;
+    public static final int END_SHOOT = 2;
+    public static final int NUM_ENDS = 3;
 
     private double overLineTime = 950;
 
     private Autonomous_5220 opMode = this;
 
     private boolean color = BLUE; //arbitrary default
-    private int startPosition = START_RAMP;
+    private int startPosition = START_NORMAL;
+    private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
-    private boolean firstBeacon = NEAR;
-    private boolean secondBeaconOn = true;
     private int endPath = END_BALL;
-    private boolean shootOnly = false;
     private boolean runCollector = false;
-    private boolean threeBalls = true;
-    private int thirdBallDistance = 0;
 
     private ShootThread shoot;
 
@@ -102,17 +95,13 @@ public class Autonomous_5220 extends OpMode_5220
 
         private static final int COLOR = 0; //these are also their telemetry lines when added to 1.
         private static final int START = 1;
-        private static final int WAIT = 2;
-        private static final int FIRST_BEACON = 3;
-        private static final int SECOND_BEACON_ON = 4;
-        private static final int PATH = 5;
-        private static final int SHOOT_ONLY = 6;
-        private static final int COLLECTOR = 7;
-        private static final int THREE_BALLS = 8;
-        private static final int THIRD_BALL_DISTANCE = 9;
+        private static final int THREE_BALLS = 2;
+        private static final int WAIT = 3;
+        private static final int PATH = 4;
+        private static final int COLLECTOR = 5;
 
 
-        private static final int NUM_SETTINGS = 10; //always make sure this is correct.
+        private static final int NUM_SETTINGS = 6; //always make sure this is correct.
 
         private int currentSetting = 0;
 
@@ -122,16 +111,12 @@ public class Autonomous_5220 extends OpMode_5220
         public void run ()
         {
             for (int i = 0; i < telemetryLines.length; i++) telemetryLines[i] = "";
-            telemetryLines[COLOR] = ("Color: " + (color == RED ? "RED" : "BLUE")); //maybe add starter asterisk here. Not sure if it is neccessary.
-            telemetryLines[START] = ("Start Position " + startPositionToString(startPosition));
-            telemetryLines[WAIT] = ("Wait Time (in seconds): " + startWaitTime /*+ " seconds"*/);
-            telemetryLines[FIRST_BEACON] = ("First Beacon Choice: " + ((firstBeacon == NEAR) ? "NEAR" : "FAR"));
-            telemetryLines[SECOND_BEACON_ON] = ("Second Beacon Scoring: " + (secondBeaconOn ? "ON" : "OFF"));
+            telemetryLines[COLOR] = ("*Color: " + (color == RED ? "RED" : "BLUE"));
+            telemetryLines[START] = ("Start Position: " + startPositionToString(startPosition));
+            telemetryLines[THREE_BALLS] = ("Third Ball: " + (thirdBallOn ? "ON" : "OFF"));
+            telemetryLines[WAIT] = ("Wait Time: " + startWaitTime + " seconds");
             telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
-            telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (runCollector ? "ON" : "OFF"));
             telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
-            telemetryLines[THREE_BALLS] = ("Three Balls: " + (threeBalls ? "ON" : "OFF"));
-            telemetryLines[THIRD_BALL_DISTANCE] = ("Third Ball Distance: " + thirdBallDistance + " inches");
 
             writeLinesToTelemetry();
 
@@ -234,7 +219,13 @@ public class Autonomous_5220 extends OpMode_5220
             else if (setting == START)
             {
                 startPosition = (startPosition + direction) % NUM_STARTS;
-                telemetryLines[START] = ("Start Position " + startPositionToString(startPosition));
+                telemetryLines[START] = ("Start Position: " + startPositionToString(startPosition));
+            }
+
+            else if (setting == THREE_BALLS)
+            {
+                thirdBallOn = !thirdBallOn;
+                telemetryLines[THREE_BALLS] = ("Third Ball: " + (thirdBallOn ? "ON" : "OFF"));
             }
 
             else if (setting == WAIT)
@@ -245,56 +236,19 @@ public class Autonomous_5220 extends OpMode_5220
                     startWaitTime = 0;
                 }
 
-                telemetryLines[WAIT] = ("Wait Time(in seconds): " + startWaitTime /*+ " seconds"*/);
-            }
-
-            else if (setting == FIRST_BEACON)
-            {
-                firstBeacon = !firstBeacon;
-
-                telemetryLines[FIRST_BEACON] = ("First Beacon Choice: " + ((firstBeacon == NEAR) ? "NEAR" : "FAR"));
-            }
-
-            else if (setting == SECOND_BEACON_ON)
-            {
-                secondBeaconOn = !secondBeaconOn;
-
-                telemetryLines[SECOND_BEACON_ON] = ("Second Beacon Scoring: " + (secondBeaconOn ? "ON" : "OFF"));
+                telemetryLines[WAIT] = ("Wait Time: " + startWaitTime + " seconds");
             }
 
             else if (setting == PATH)
             {
-                endPath = (endPath + direction) % NUM_STARTS;
+                endPath = (endPath + direction) % NUM_ENDS;
                 telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
-            }
-                        else if (setting == SHOOT_ONLY)
-            {
-                shootOnly = !shootOnly;
-                telemetryLines[SHOOT_ONLY] = ("Shoot Only: " + (shootOnly ? "ON" : "OFF"));
             }
 
             else if (setting == COLLECTOR)
             {
                 runCollector = !runCollector;
                 telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
-            }
-
-            else if (setting == THREE_BALLS)
-            {
-                threeBalls = !threeBalls;
-                telemetryLines[THREE_BALLS] = ("Three Balls: " + (threeBalls ? "ON" : "OFF"));
-            }
-
-            else if (setting == THIRD_BALL_DISTANCE)
-            {
-                telemetryLines[THIRD_BALL_DISTANCE] = ("Third Ball Distance " + thirdBallDistance /*+ " seconds"*/);
-                thirdBallDistance += direction;
-                if (thirdBallDistance < 0)
-                {
-                    thirdBallDistance = 0;
-                }
-
-                telemetryLines[THIRD_BALL_DISTANCE] = ("Third Ball Distance: " + thirdBallDistance + " inches");
             }
 
             if (telemetryLines[currentSetting].charAt(0) != '*') //change to string equals comparison if this doesn't work
@@ -323,9 +277,8 @@ public class Autonomous_5220 extends OpMode_5220
         {
             switch (s)
             {
-                case START_RAMP: return "RAMP START";
-                case START_CORNER: return "CORNER START";
-                case START_STRAIGHT: return "STRAIGHT START";
+                case START_NORMAL: return "NORMAL";
+                case START_SHOOT_ONLY: return "SHOOT ONLY (near corner)";
                 default: return "Error: Start Position Number.";
             }
         }
@@ -334,9 +287,10 @@ public class Autonomous_5220 extends OpMode_5220
         {
             switch (s)
             {
-                case END_BALL: return "BALL";
+                case END_BALL: return "CAP BALL";
                 case END_BLOCK: return "BEACON DEFENSE";
-                default: return "Error: Start Position Number.";
+                case END_SHOOT: return "SHOOTING";
+                default: return "Error: End Path Number.";
             }
         }
     }
@@ -344,6 +298,7 @@ public class Autonomous_5220 extends OpMode_5220
     public void initialize () //override
     {
         super.initialize(); //do everything in the original, common initialization.
+        shoot = new ShootThread();
         new ConfigLoop().start(); //
         waitFullCycle();
         //colorSensorDown.enableLed(true);
@@ -492,9 +447,9 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void getThirdBall ()
     {
-        if (color == BLUE)
+        if (startPosition == START_NORMAL)
         {
-            if (thirdBallDistance == 0)
+            if (color == BLUE)
             {
                 setSweeperPower(1);
                 sleep(800);
@@ -504,49 +459,30 @@ public class Autonomous_5220 extends OpMode_5220
                 setSweeperPower(0);
             }
 
-            else
+            else if (color == RED)
             {
-                strafe(-3, 0.98);
-                setSweeperPower(1);
-                move(-thirdBallDistance, 0.3, ENCODER);
-                move(thirdBallDistance, 0.3, ENCODER);
-                //move(-2);
-                diagonalStrafeAgainstWall(FORWARDS);
-                sleep (3000);
-                move (-5);
-                strafe (-3);
-                rotateEncoder(-20);
-                moveTime(1200, 0.3);
+                //NEED TO FINISH THIS
             }
         }
 
-        else if (color == RED)
+        else if (startPosition == START_SHOOT_ONLY)
         {
-            
+            if (color == BLUE)
+            {
+                //UNFINISHED
+            }
+
+            else if (color == RED)
+            {
+                //UNFINISHED
+            }
         }
     }
 
     private void startToShootingPosition()
     {
-        /*
-        if(startPosition == START_CORNER)
-        {
-            if(color == BLUE)
-            {
-                move(-1);
-                strafe(-35.3, 0.8);
-                move(3);
-            }
-
-            else if (color == RED)
-            {
-                move(-1);
-                strafe(30, 0.8);
-                move(3);
-            }
-        }
-        */
         setSweeperPower(0);
+
         if(color == BLUE)
         {
             move(-4, 0.4);
@@ -596,9 +532,6 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            //rotateEncoder(-0.3);
-            //move (26);
-
             rotateEncoder(-12.5);
             move(-44.7);
             rotateEncoder(9.1);
@@ -634,6 +567,8 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void pushButtonsAlongWall ()
     {
+        if (runCollector && (color == RED)) setSweeperPower(0.95);
+
         findButton();
 
         if(color == RED)
@@ -662,6 +597,7 @@ public class Autonomous_5220 extends OpMode_5220
         }
 
         pushButton();
+        setSweeperPower(0);
         sleep(200);
     }
 
@@ -681,13 +617,14 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(runCollector)
             {
-                setSweeperPower(1.0);
+                setSweeperPower(0.95);
             }
+
             move (-13);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
-            setSweeperPower(0.0);
+            setSweeperPower(0);
             sleep(150);
         }
     }
@@ -705,7 +642,6 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(-4.2);
             move(-50);
         }
-        //programFinished = true;
 
         else if (color == RED)
         {
@@ -713,6 +649,7 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(4.6);
             move(50);
         }
+
         setSweeperPower(0.0);
     }
 
@@ -730,11 +667,6 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void farShootingToBall()
-    {
-        move(-47);
-    }
-
     private void farBeaconToOpponent()
     {
         if(color == BLUE)
@@ -749,77 +681,73 @@ public class Autonomous_5220 extends OpMode_5220
             move(-15);
         }
     }
-    //OLD STUFF:
 
-    private void wallToBall ()
+    private void farBeaconToBallWithShooting()
     {
         if(color == BLUE)
         {
-            strafe(-21);
-            rotateEncoder(6.4);
-            move(-49);
+            //THIS SHOULD NEVER HAPPEN
+        }
+
+        else if(color == RED) //untested
+        {
+            strafe (-5);
+            rotateEncoder(-14);
+            strafe (20);
+            shootAutonomousBalls();
+            strafe (30); //hopefully knocking the cap ball off with strafing will work
+        }
+    }
+
+    private void shootOnly () //UNFINISHED
+    {
+        if(color == BLUE)
+        {
+
         }
 
         else if (color == RED)
         {
-            strafe (-23);
-            rotateEncoder(28);
-            move (-36);
+
         }
     }
 
     public void autonomous ()
     {
-        if(shootOnly)
+        if (thirdBallOn) getThirdBall();
+        sleep(200);
+
+        if(startPosition == START_SHOOT_ONLY) //UNTESTED
         {
-            if(color == BLUE)
-            {
-                move(-1);
-                strafe(-34.2, 0.8);
-                move(3);
-            }
-
-            else if (color == RED)
-            {
-                move(-1);
-                strafe(30, 0.8);
-                move(3);
-            }
-
-            startToShootingPosition();
-            sleep(200);
-            shootAutonomousBalls();
-            sleep(100);
+            shootOnly();
+            stopDrivetrain();
+            shoot.mStop();
+            return;
         }
 
-        else
+        startToShootingPosition();
+        sleep(200);
+        shootAutonomousBalls();
+        sleep(100);
+        shootingPositionToWall();
+        pushButtonsAlongWall();
+
+        if (endPath == END_BLOCK)
         {
-            if (threeBalls) getThirdBall();
-            sleep(200);
-            startToShootingPosition();
-            sleep(200);
-            shootAutonomousBalls();
-            sleep(100);
-            shootingPositionToWall();
-            pushButtonsAlongWall();
-
-            if (endPath == END_BLOCK)
-            {
-                farBeaconToOpponent();
-            }
-
-            else if (endPath == END_BALL)
-            {
-                alignWithFarLine();
-                farBeaconToBall();
-
-                if (runCollector)
-                {
-                    ballToShooting();
-                    shootAutonomousBalls();
-                }
-            }
+            farBeaconToOpponent();
         }
+
+        else if (endPath == END_SHOOT)
+        {
+            alignWithFarLine();
+            farBeaconToBallWithShooting();
+        }
+        else if (endPath == END_BALL)
+        {
+            alignWithFarLine();
+            farBeaconToBall();
+        }
+
 
         stopDrivetrain();
         shoot.mStop();
@@ -827,10 +755,8 @@ public class Autonomous_5220 extends OpMode_5220
 
     public void main ()
     {
-        //ftcRCA.color = color;
         new DebuggerDisplayLoop().start();
         waitFullCycle();
-
         //navX.zeroYaw();
         waitFullCycle();
 
@@ -844,15 +770,11 @@ public class Autonomous_5220 extends OpMode_5220
         moveDoor(DOOR_CLOSED);
         waitFullCycle();
 
-        shoot = new ShootThread();
-
         while (gameTimer.time() < (startWaitTime * 1000))
         {
 
         }
 
-        linePATHedTime = 2750000; //really big number just for debug
-        //test();
         autonomous();
     }
 }

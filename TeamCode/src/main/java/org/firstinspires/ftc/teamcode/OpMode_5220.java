@@ -1440,6 +1440,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         private boolean suspended;
         private boolean stopped;
 
+        private boolean opModeHasBeenActive = false;
+
         ShootThread()
         {
             thrd = new Thread(this);
@@ -1453,14 +1455,16 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             try
             {
-                while(runConditions())
+                while(!opModeHasBeenActive || runConditions()) //should keep running
                 {
+                    if (opModeIsActive()) opModeHasBeenActive = true;
                     shoot();
 
                     synchronized (this)
                     {
                         while(suspended)
                         {
+                            if (opModeIsActive()) opModeHasBeenActive = true;
                             stopShooting();
                             wait();
                         }

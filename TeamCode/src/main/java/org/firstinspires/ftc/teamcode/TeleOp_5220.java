@@ -46,6 +46,12 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     private boolean slowDriveOn = false;
     private boolean fieldOrient = false;
 
+    private int teleOpShootingState = SHOOTER_OFF;
+    private static final int SHOOTER_OFF = 0;
+    private static final int SHOOTER_ON = 1;
+    private static final int SHOOTER_FIRING = 2;
+    private boolean fireWhenReady = false;
+
     private double temp, theta;
     private double leftFront, leftBack, rightBack, rightFront;
 
@@ -60,7 +66,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         return ProgramType.TELEOP;
     }
 
-    //INITIALZATION:
+    //INITIALIZATION:
 
     public void initialize ()
     {
@@ -76,10 +82,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     public void loop5220()
     {
         //STATE VARIABLES FOR LOOP:
-        Stopwatch topHatXTime = null;
-        Stopwatch topHatYTime = null;
-        Stopwatch dumperTime = null;
-        Stopwatch hookTiltTime = null;
+        Stopwatch shooterTimer = null;
 
         double swivelMovementStart = 0.0;
 
@@ -99,30 +102,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         {
             writeToLog("prevGamepad Copying Error.");
         }
-
-
-        boolean prevTopHatUp1 = false; //maybe change these initialization if they mess something up
-        boolean prevTopHatDown1 = false;
-        boolean prevTopHatLeft1 = false;
-        boolean prevTopHatRight1 = false;
-        boolean prevTopHatUp2 = false; //maybe change these initialization if they mess something up
-        boolean prevTopHatDown2 = false;
-        boolean prevTopHatLeft2 = false;
-        boolean prevTopHatRight2 = false;
-        boolean prevX1 = false;
-        boolean prevRSB1 = false;
-        boolean prevB1 = false;
-        boolean prevLB = false;
-        boolean prevLT = false;
-        boolean prevBack = false;
-        boolean prevY2 = false;
-        boolean prevX2 = false;
-        boolean prevB2 = false;
-        boolean prevA2 = false;
-        boolean prevLB2 = false;
-        boolean prevLT2 = false;
-        boolean prevRB2 = false;
-        boolean prevRT2 = false;
 
         while (runConditions())
         {
@@ -286,67 +265,40 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 dPadMode = !dPadMode;
             }
 
-            /*if (shooterState == SHOOTER_READY)
+            if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a) || fireWhenReady)
             {
-                if ((!shootingAll && gamepad1.a && !prevGamepad1.a) || (!shootingAll && gamepad2.a && !prevGamepad2.a))
+                if (teleOpShootingState == SHOOTER_OFF)
                 {
-                    shootAllMulti();
+                    shoot.mResume();
+                    shooterTimer = new Stopwatch();
+                    teleOpShootingState = SHOOTER_ON;
+                }
+                
+                else if (teleOpShootingState == SHOOTER_ON) //THE ELSE HERE IS IMPORTANT
+                {
+                    if (shooterTimer.time() < 1210)
+                    {
+                        fireWhenReady = true;
+                    }
+
+                    else
+                    {
+                        moveDoor(DOOR_OPEN);
+                        fireWhenReady = false;
+                        shooterTimer = null;
+                        teleOpShootingState = SHOOTER_FIRING;
+                    }
                 }
 
-                else if((shootingAll && gamepad1.a && !prevGamepad1.a) || (shootingAll && gamepad2.a && !prevGamepad2.a))
+                else if (teleOpShootingState == SHOOTER_FIRING)
                 {
-                    killThread = true;
-                }
-
-                else if (gamepad2.x)
-                {
-                    setMotorPower(shooterMotor, 0.8);
-                    shooterChanged = true;
-                }
-
-                else if (gamepad2.y)
-                {
-                    setMotorPower(shooterMotor, -0.8);
-                    shooterChanged = true;
-                }
-                else setMotorPower(shooterMotor, 0.0);
-            }
-
-            if ((gamepad1.a && !prevGamepad1.a && !shooterRunning) || (gamepad2.a && !prevGamepad2.a && !shooterRunning))
-            {
-                moveDoor(DOOR_OPEN);
-                shoot();
-                sleep(100);
-            }
-
-            else if((gamepad1.a && !prevGamepad1.a && shooterRunning) || (gamepad2.a && !prevGamepad2.a && shooterRunning))
-            {
-                stopShooting();
-                moveDoor(DOOR_CLOSED);
-                sleep(100);
-            }
-            */
-
-            /*if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
-            {
-                if(!runnable.running)
-                {
-                    shoot = new Thread (runnable);
-                    shoot.start();
-                    sleep(800);
-                    moveDoor(DOOR_OPEN);
-                }
-
-                else
-                {
-                    runnable.terminate();
-                    shoot = null;
+                    shoot.mSuspend();
                     moveDoor(DOOR_CLOSED);
+                    teleOpShootingState = SHOOTER_OFF;
                 }
-            } */
 
-            if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a))
-            {
+                //OLD SHOOTING CONTROL CODE:
+                /*
                 if(shoot.isSuspended())
                 {
                     shoot.mResume();
@@ -361,6 +313,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     shoot.mSuspend();
                     moveDoor(DOOR_CLOSED);
                 }
+                */
             }
 
                 /*else if (gamepad2.x)
@@ -377,11 +330,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 else setMotorPower(shooterMotor, 0.0); */
 
-
-/*
-            if (gamepad1.x && (!prevB1)) shootMulti();
-            if (gamepad1.y && (!prevGamepad1.y)) shootMulti(); //if this prevGamepad thing works then all the individual previous value variables can be eliminated.
-*/
             if (gamepad1.right_bumper || gamepad2.right_bumper) setSweeperPower(1.0);
             else if (gamepad1.right_trigger > 0.7 || gamepad2.right_trigger > 0.7) setSweeperPower(-1.0);
             else setSweeperPower(0);
@@ -428,49 +376,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 }
             }
 
-            setMotorPower(liftMotor, liftPower);
-
-
-            /*if ((gamepad1.dpad_left && dPadMode == DPAD_LIFT) || gamepad2.dpad_left) moveLiftTiltServo(LIFT_TILT_FORWARDS);
-            else if ((gamepad1.dpad_right  && dPadMode == DPAD_LIFT) || gamepad2.dpad_right) moveLiftTiltServo(LIFT_TILT_BACKWARDS );
-
-            if ((gamepad1.left_bumper && !prevGamepad1.left_bumper) || (gamepad2.left_bumper && !prevGamepad2.left_bumper)) setShooterPreset(currentShooterPreset + 1);
-            if ((gamepad1.left_trigger > 0.7 && !(prevGamepad1.left_trigger > 0.7)) || (gamepad2.left_trigger > 0.7 && !(prevGamepad2.left_trigger > 0.7))) setShooterPreset(currentShooterPreset - 1);
-            */
-
-            //for debug
-            /*
-            if (gamepad2.a) colorSensorDown.enableLed(true);
-            if (gamepad2.b) colorSensorDown.enableLed(false);
-            if (gamepad2.y) colorSensorFront.enableLed(true);
-            if (gamepad2.x) colorSensorFront.enableLed(false);
-*/
             //PREVIOUS VALUE SETTINGS
-
-            prevTopHatUp1 = gamepad1.dpad_up;
-            prevTopHatDown1 = gamepad1.dpad_down;
-            prevTopHatRight1 = gamepad1.dpad_right;
-            prevTopHatLeft1 = gamepad1.dpad_left;
-            prevTopHatUp2 = gamepad2.dpad_up;
-            prevTopHatDown2 = gamepad2.dpad_down;
-            prevTopHatRight2 = gamepad2.dpad_right;
-            prevTopHatLeft2 = gamepad2.dpad_left;
-
-            prevRSB1 = gamepad1.right_stick_button;
-            prevX1 = gamepad1.x;
-            prevB1 = gamepad1.b;
-            prevLB = gamepad1.left_bumper;
-            prevLT = gamepad1.left_trigger > 0.7;
-            prevBack = gamepad1.back;
-
-            prevY2 = gamepad2.y;
-            prevX2 = gamepad2.x;
-            prevB2 = gamepad2.b;
-            prevA2 = gamepad2.a;
-            prevLB2 = gamepad2.left_bumper;
-            prevLT2 = gamepad2.left_trigger > 0.7;
-            prevRB2 = gamepad2.right_bumper;
-            prevRT2 = gamepad2.right_trigger > 0.7;
 
             try
             {
@@ -483,10 +389,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 writeToLog("prevGamepad Copying Error.");
             }
 
-            // telemetry.addData("9", "RSA: " + resetAutomationOn);
             waitNextCycle();
-
-
         }
     }
 
@@ -494,7 +397,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     {
 
         new DebuggerDisplayLoop().start();
-        //for (DcMotor dcm: driveMotors) dcm.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         /*
         waitFullCycle();
         colorSensorFront.enableLed(true);

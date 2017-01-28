@@ -57,7 +57,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
     private static final boolean DPAD_LIFT = false;
     private static final boolean DPAD_DRIVE = true;
-    private boolean dPadMode = DPAD_LIFT;
+    private boolean dPadMode = DPAD_DRIVE;
 
     private ShootThread shoot;
 
@@ -178,10 +178,10 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                     if (frontPower == 0 && backPower == 0) {
                         if (dPadMode == DPAD_DRIVE) {
-                            if (gamepad1.dpad_up) setDrivePower(-0.21);
-                            else if (gamepad1.dpad_down) setDrivePower(0.21);
-                            else if (gamepad1.dpad_right) setStrafePower(-0.34);
-                            else if (gamepad1.dpad_left) setStrafePower(0.34);
+                            if (gamepad1.dpad_up) setDrivePower(-0.34);
+                            else if (gamepad1.dpad_down) setDrivePower(0.34);
+                            else if (gamepad1.dpad_right) setStrafePower(0.40);
+                            else if (gamepad1.dpad_left) setStrafePower(-0.40);
                             else setDrivePower(0);
                         } else {
                             setDrivePower(0);
@@ -273,7 +273,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     shooterTimer = new Stopwatch();
                     teleOpShootingState = SHOOTER_ON;
                 }
-                
+
                 else if (teleOpShootingState == SHOOTER_ON) //THE ELSE HERE IS IMPORTANT
                 {
                     if (shooterTimer.time() < 1210)
@@ -330,9 +330,20 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 else setMotorPower(shooterMotor, 0.0); */
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper) setSweeperPower(1.0);
-            else if (gamepad1.right_trigger > 0.7 || gamepad2.right_trigger > 0.7) setSweeperPower(-1.0);
-            else setSweeperPower(0);
+            if (gamepad1.right_bumper || gamepad2.right_bumper)
+            {
+                setSweeperPower(1.0);
+                moveDoor(DOOR_CLOSED);
+            }
+            else if (gamepad1.right_trigger > 0.7 || gamepad2.right_trigger > 0.7)
+            {
+                setSweeperPower(-1.0);
+                moveDoor(DOOR_CLOSED);
+            }
+            else
+            {
+                setSweeperPower(0);
+            }
 
             if ((gamepad1.b && !prevGamepad1.b) || (gamepad2.b && !prevGamepad2.b))
                 moveDoor(doorServo.getPosition() != DOOR_OPEN ? DOOR_OPEN : DOOR_CLOSED);
@@ -376,6 +387,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 }
             }
 
+            setMotorPower(liftMotor, liftPower);
             //PREVIOUS VALUE SETTINGS
 
             try

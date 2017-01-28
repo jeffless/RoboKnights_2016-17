@@ -53,17 +53,17 @@ public class FlywheelTest extends LinearOpMode
 
     protected Servo doorServo;
 
-    double tbhI = 300.0;
-    private double kP = 9000000.0;
+    /*double tbhI = 300.0;
+    private double kP = 0.4;
     private double kI = 0.0;
     //private double kD = 380000;
-    private double kD = 10000.0;
+    private double kD = 0.0;
 
     private double integral = 0.0;
     private double derivative = 0.0;
 
     private double motorOut = 0.0;
-    private double fTarget = 7.5e-7;
+    private double fTarget = 1.1e-6;
     private double fVelocity = 0.0;
     private double fError = 0.0;
     private double fLastError = 0.0;
@@ -83,6 +83,22 @@ public class FlywheelTest extends LinearOpMode
 
     private double targetVoltage = 12.5;
     private double voltage;
+    */
+
+    protected static final double TARGET_VOLTAGE = 12.5;
+    protected static final double TARGET_SPEED = 1.1e-6;
+
+    protected static final double vP = 0.18;
+    protected static final double sP = 0.37;
+    protected static final double sI = 0.0;
+    protected static final double sD = 0.0;
+
+    protected static double voltage = 0;
+    protected static double speed = 0;
+    protected static double integral = 0;
+    protected static double lastError;
+    protected static double lastTime;
+    protected static double lastEncoder;
 
     private static final String TAG = "MyActivity";
 
@@ -103,7 +119,7 @@ public class FlywheelTest extends LinearOpMode
 
         doorServo = hardwareMap.servo.get("dServo");
 
-        firstCross = true;
+        //firstCross = true;
 
         try
         {
@@ -113,12 +129,25 @@ public class FlywheelTest extends LinearOpMode
         {
 
         }
+
+        ShootThread shoot = new ShootThread();
         while (opModeIsActive())
         {
-
+            voltage = batteryVoltage();
+            sleep(100);
+            sweeperMotor.setPower(1);
+            sleep(3000);
+            sweeperMotor.setPower(0);
+            shoot.mResume();
+            sleep(1200);
+            doorServo.setPosition(1.0);
+            sleep(1200);
+            shoot.mSuspend();
+            sleep(100);
         }
     }
 
+    /*
     private void printVelocity()
     {
         fVelocityTime = System.nanoTime();
@@ -131,6 +160,7 @@ public class FlywheelTest extends LinearOpMode
         telemetry.addData("6", "Encoder Change " + (fEncoder - fLastEncoder));
         telemetry.addData("7", "Time Change " + (fVelocityTime - fLastVelocityTime));
         telemetry.addData("8", "Velocity " + fVelocity);
+        telemetry.addData("9", "Voltage " + batteryVoltage());
         telemetry.update();
 
         fLastEncoder = fEncoder;
@@ -189,18 +219,13 @@ public class FlywheelTest extends LinearOpMode
             integral = 0;
         }
 
-        if(Math.abs(fError) > 50)
-        {
-            integral = 0;
-        }
-
         derivative = fError - fLastError;
 
         fLastError = fError;
         fLastEncoder = fEncoder;
         fLastVelocityTime = fVelocityTime;
 
-        motorOut = (kP * fError) + (kI * integral) + (kD * derivative);
+        motorOut = (kP * fError) + (kI * integral) + (kD * derivative) + .8;
 
         motorOut = Range.clip(motorOut, 0.0, 1.0);
 
@@ -285,5 +310,117 @@ public class FlywheelTest extends LinearOpMode
         motorOut = (error * kP) + .88;
         motorOut = Range.clip(motorOut, 0, 1);
         setFPower(motorOut);
+    } */
+
+    private void setFPower(double power)
+    {
+        flywheelLeft.setPower(power);
+        flywheelRight.setPower(power);
+    }
+
+    public final void shoot()
+    {
+        double vError = TARGET_VOLTAGE - voltage;
+        double vMotorOut = (vError * vP) + .82;
+        vMotorOut = Range.clip(vMotorOut, 0, 1);
+
+        double sError = TARGET_SPEED - flywheelSpeed();
+        double derivative = sError - lastError;
+        integral += sError;
+        lastError = sError;
+
+        double sMotorOut = (sP * sError) + (sI * integral) + (sD * derivative) + vMotorOut;
+        sMotorOut = Range.clip(sMotorOut, 0.0, 1.0);
+        setFPower(sMotorOut);
+        sleep(50);
+    }
+
+    public final void stopShooting()
+    {
+        setFPower(0);
+    }
+
+    public double flywheelSpeed()
+    {
+        long time = System.nanoTime();
+        long encoder = flywheelRight.getCurrentPosition();
+        double speed = (encoder - lastEncoder) / (time - lastTime);
+
+        lastEncoder = encoder;
+        lastTime = time;
+
+        return speed;
+    }
+
+    public double batteryVoltage()
+    {
+        return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
+    }
+
+    public class ShootThread implements Runnable
+    {
+        Thread thrd;
+
+        private boolean suspended;
+        private boolean stopped;
+
+        private boolean opModeHasBeenActive = false;
+
+        ShootThread()
+        {
+            thrd = new Thread(this);
+            suspended = true;
+            stopped = false;
+            voltage = batteryVoltage();
+            thrd.start();
+        }
+
+        public void run()
+        {
+            try
+            {
+                while(!opModeHasBeenActive || opModeIsActive()) //should keep running
+                {
+                    if (opModeIsActive()) opModeHasBeenActive = true;
+                    shoot();
+
+                    synchronized (this)
+                    {
+                        while(suspended)
+                        {
+                            if (opModeIsActive()) opModeHasBeenActive = true;
+                            stopShooting();
+                            wait();
+                        }
+                        if(stopped) break;
+                    }
+                }
+            } catch(InterruptedException exc){}
+        }
+
+        synchronized void mStop()
+        {
+            stopped = true;
+            suspended = false;
+            notify();
+        }
+
+        synchronized void mSuspend()
+        {
+            suspended = true;
+        }
+
+        synchronized void mResume ()
+        {
+            suspended = false;
+            voltage = batteryVoltage();
+            integral = 0;
+            notify();
+        }
+
+        public boolean isSuspended()
+        {
+            return suspended;
+        }
     }
 }

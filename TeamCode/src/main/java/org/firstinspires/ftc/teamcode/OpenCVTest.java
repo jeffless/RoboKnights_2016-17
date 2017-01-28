@@ -11,7 +11,8 @@ import org.opencv.core.Mat;
 
 @TeleOp(name = "OpenCV 5220", group = "Main") //change to autonomous if making this called a teleop changes something for the worse
 
-public class OpenCVTest extends OpMode_5220
+public class OpenCVTest
+        extends OpMode_5220
 {
     @Override
     public void setup()

@@ -195,24 +195,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           android:id="@+id/show_camera_activity_java_surface_view"
           opencv:show_fps="true"
           opencv:camera_id="any" />
-
-      <Button
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Grab"
-          android:id="@+id/button3"
-          android:layout_gravity="end|bottom"
-          android:onClick="frameButtonOnClick"/>
-
-      <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textAppearance="?android:attr/textAppearanceSmall"
-          android:text="[RESULT]"
-          android:id="@+id/resultText"
-          android:layout_gravity="end|top"
-          android:textColor="#ff0000" />
-
     </FrameLayout>
 
 

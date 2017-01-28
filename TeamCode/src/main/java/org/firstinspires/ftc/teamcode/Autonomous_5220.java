@@ -60,9 +60,9 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = BLUE; //arbitrary default
+    private boolean color = RED; //arbitrary default
     private int startPosition = START_NORMAL;
-    private boolean thirdBallOn = false;
+    private boolean thirdBallOn = true;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private int endPath = END_BALL;
     private boolean runCollector = false;
@@ -298,7 +298,6 @@ public class Autonomous_5220 extends OpMode_5220
     public void initialize () //override
     {
         super.initialize(); //do everything in the original, common initialization.
-        shoot = new ShootThread();
         new ConfigLoop().start(); //
         waitFullCycle();
         //colorSensorDown.enableLed(true);
@@ -461,7 +460,12 @@ public class Autonomous_5220 extends OpMode_5220
 
             else if (color == RED)
             {
-                //NEED TO FINISH THIS
+                setSweeperPower(1);
+                sleep(800);
+                strafe(4);
+                rotateEncoder(-18.8);
+                moveTime(1200, -0.3);
+                setSweeperPower(0);
             }
         }
 
@@ -492,9 +496,14 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if(color == RED)
         {
-            move(-4, 0.4);
+            /*move(-4, 0.4);
             rotateEncoder(-27.4);
             move(19.8, 0.6);
+            */
+
+            move(4, 0.4);
+            rotateEncoder(6.8);
+            move(20.3, 0.6);
         }
     }
 
@@ -513,10 +522,13 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            move(12, 0.5);
-            rotateEncoder(24.3, 0.7);
+            move(15, 0.5);
+            rotateEncoder(22.0, 0.7);
             move(-3);
             strafeTime(1000, 0.7);
+            diagonalStrafeAgainstWall(FORWARDS);
+            sleep(900);
+
             stopDrivetrain();
         }
     }
@@ -769,6 +781,8 @@ public class Autonomous_5220 extends OpMode_5220
         sleep(200);
         moveDoor(DOOR_CLOSED);
         waitFullCycle();
+
+        shoot = new ShootThread();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

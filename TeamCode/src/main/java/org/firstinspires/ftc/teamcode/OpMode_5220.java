@@ -74,7 +74,8 @@ import java.util.concurrent.RunnableFuture;
 
 //Currently using FTC SDK 2.2
 
-public abstract class OpMode_5220 extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2
+public abstract class OpMode_5220 extends LinearOpMode
+        implements CameraBridgeViewBase.CvCameraViewListener2
 {
     //CONSTANTS:
 
@@ -163,11 +164,12 @@ public abstract class OpMode_5220 extends LinearOpMode implements CameraBridgeVi
     protected static final double CLAMP_DOWN = 0.93;
 
     protected static final double TARGET_VOLTAGE = 12.5;
-    protected static final double TARGET_SPEED = 7.5e-7;
+    protected static final double TARGET_SPEED = 1.1e-6;
 
-    protected static final double kP = 0.18;
-    protected static final double kI = 0.0;
-    protected static final double kD = 0.0;
+    protected static final double vP = 0.18;
+    protected static final double sP = 0.37;
+    protected static final double sI = 0.1;
+    protected static final double sD = 0.0;
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
@@ -1411,24 +1413,24 @@ public abstract class OpMode_5220 extends LinearOpMode implements CameraBridgeVi
 
     public final void shoot()
     {
-        double error = TARGET_VOLTAGE - voltage;
-        double motorOut = (error * kP) + .82;
-        motorOut = Range.clip(motorOut, 0, 1);
-        setMotorPower(flywheelLeft, motorOut);
-        setMotorPower(flywheelRight, motorOut);
-        sleep(200);
+        double vError = TARGET_VOLTAGE - voltage;
+        double vMotorOut = (vError * vP) + .82;
+        vMotorOut = Range.clip(vMotorOut, 0, 1);
+
+        double sError = TARGET_SPEED - flywheelSpeed();
+        double derivative = sError - lastError;
+        integral += sError;
+        lastError = sError;
+
+        double sMotorOut = (sP * sError) + (sI * integral) + (sD * derivative) + vMotorOut;
+        sMotorOut = Range.clip(sMotorOut, 0.0, 1.0);
+        setMotorPower(flywheelLeft, sMotorOut);
+        setMotorPower(flywheelRight, sMotorOut);
+        sleep(30);
 
         /*
-        double error = TARGET_SPEED - flywheelSpeed();
-        double derivative = error - lastError;
-        integral += error;
-        lastError = error;
-
-        double motorOut = (kP * error) + (kI * integral) + (kD * derivative) + .86;
-        motorOut = Range.clip(motorOut, 0.0, 1.0);
-        setMotorPower(flywheelLeft, motorOut);
-        setMotorPower(flywheelRight, motorOut);
-        sleep(200);
+        setMotorPower(flywheelLeft, 85);
+        setMotorPower(flywheelRight, 85);
         */
     }
 

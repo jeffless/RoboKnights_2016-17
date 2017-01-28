@@ -32,9 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.firstinspires.ftc.teamcode;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.view.View;
+import android.view.ViewGroup;
 
 //import com.qualcomm.ftcrobotcontroller.FtcRobotControllerActivity;
 import com.qualcomm.ftcrobotcontroller.R;
@@ -55,6 +57,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -65,7 +74,7 @@ import java.util.concurrent.RunnableFuture;
 
 //Currently using FTC SDK 2.2
 
-public abstract class OpMode_5220 extends LinearOpMode
+public abstract class OpMode_5220 extends LinearOpMode implements CameraBridgeViewBase.CvCameraViewListener2
 {
     //CONSTANTS:
 
@@ -210,7 +219,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected MediaPlayer mediaPlayer;
     public static final boolean MUSIC_ON = true;
-    public static boolean shooterRunning = false;
 
     protected static double voltage = 0;
     protected static double speed = 0;
@@ -218,6 +226,13 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static double lastError;
     protected static double lastTime;
     protected static double lastEncoder;
+
+    protected boolean newImage = false;
+    private static JavaCameraView openCVView = null;
+    private static int width;
+    private static int height;
+    private static boolean initialized = false;
+
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
@@ -1394,15 +1409,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         return true;
     }
 
-    protected int shooterTarget = 0;
-    protected int shooterOffset = 0;
-    protected int shooterInit = 0;
-
-
-    protected boolean shooterChanged = false;
-    protected int shooterState = SHOOTER_READY;
-    public static final int SHOOTER_READY = 0, SHOOTER_ACTIVE = 1, SHOOTER_SETUP = 2;
-
     public final void shoot()
     {
         double error = TARGET_VOLTAGE - voltage;
@@ -1430,7 +1436,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     {
         setMotorPower(flywheelLeft, 0);
         setMotorPower(flywheelRight, 0);
-        shooterRunning = false;
     }
 
     public class ShootThread implements Runnable
@@ -1500,67 +1505,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         }
     }
 
-    /*
-    public final void shootAll ()
-    {
-        ShootThread shoot = new ShootThread();
-        shoot.startShooting();
-
-        sleep(600);
-        moveDoor(DOOR_OPEN);
-        sleep(500);
-        while (runConditions())
-        {
-            sleep(300);
-            if(!isBallLoaded())
-            {
-                shoot.stopShooting();
-
-                sleep(1200);
-                moveDoor(DOOR_CLOSED);
-                break;
-            }
-
-            if(killThread)
-            {
-                shoot.stopShooting();
-
-                moveDoor(DOOR_CLOSED);
-                killThread = false;
-                break;
-            }
-        }
-        shootingAll = false;
-    }
-
-    private final class ShootAllThread implements Runnable
-    {
-        private Thread shooting;
-
-        public void startShooting()
-        {
-            if(shooting == null)
-            {
-                shooting = new Thread(this);
-                shooting.start();
-            }
-        }
-
-        public void run ()
-        {
-            shootAll();
-            shooting = null;
-        }
-    }
-    protected boolean shootingAll = false;
-    public final void shootAllMulti ()
-    {
-        shootingAll = true;
-
-        ShootAllThread shoot = new ShootAllThread();
-        shoot.startShooting();
-    }
-    */
     public double batteryVoltage()
     {
         return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
@@ -1636,5 +1580,105 @@ public abstract class OpMode_5220 extends LinearOpMode
             }
         }
         telemetry.update();
+    }
+
+    private void initializeCameraView()
+    {
+        final Activity mActivity = (Activity) hardwareMap.appContext;
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        class CameraThread implements Runnable
+        {
+            private JavaCameraView mCameraView = null;
+            public JavaCameraView getJCV() {return mCameraView;}
+
+            public void run()
+            {
+                mCameraView = new JavaCameraView(mActivity, CameraBridgeViewBase.CAMERA_ID_BACK);
+                mCameraView.setMaxFrameSize(480, 320);
+
+                ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                mCameraView.setLayoutParams(params);
+
+                ViewGroup img = (ViewGroup) mActivity.findViewById(R.id.cameraMonitorViewId);
+                img.addView(mCameraView, 0);
+            }
+        }
+
+        CameraThread cameraThread = new CameraThread();
+        mActivity.runOnUiThread(cameraThread);
+
+        JavaCameraView mCameraView = null;
+        while(mCameraView == null)
+        {
+            mCameraView = cameraThread.getJCV();
+        }
+
+        openCVView = mCameraView;
+        openCVView.setVisibility(CameraBridgeViewBase.VISIBLE);
+        openCVView.setCvCameraViewListener(this);
+
+        width = openCVView.getMeasuredWidth();
+        height = openCVView.getMeasuredHeight();
+    }
+
+    protected void initializeOpenCV()
+    {
+        BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(hardwareMap.appContext)
+        {
+            @Override
+            public void onManagerConnected(int status)
+            {
+                switch (status)
+                {
+                    case LoaderCallbackInterface.SUCCESS:
+                    {
+                        initializeCameraView();
+                        openCVView.enableView();
+                    } break;
+                    default:
+                    {
+                        super.onManagerConnected(status);
+                    } break;
+                }
+            }
+        };
+
+        if(!OpenCVLoader.initDebug())
+        {
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, hardwareMap.appContext, mLoaderCallback);
+        }
+
+        else
+        {
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+    }
+
+    protected void endCamera()
+    {
+        openCVView.disableView();
+    }
+    @Override
+    public void onCameraViewStarted(int width, int height)
+    {
+
+    }
+
+    @Override
+    public void onCameraViewStopped()
+    {
+        openCVView.disableView();
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
+    {
+        Mat rgb = inputFrame.rgba();
+        newImage = true;
+
+        Mat rtrnImage = rgb;
+
+        return rtrnImage;
     }
 }

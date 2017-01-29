@@ -164,11 +164,11 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double CLAMP_DOWN = 0.93;
 
     protected static final double TARGET_VOLTAGE = 12.5;
-    protected static final double TARGET_SPEED = 1.1e-6;
+    protected static final double TARGET_VELOCITY = 1.1e-6;
 
     protected static final double vP = 0.18;
-    protected static final double sP = 0.37;
-    protected static final double sI = 0.1;
+    protected static final double sP = 8500;
+    protected static final double sI = 10;
     protected static final double sD = 0.0;
 
     protected static final double ST_1 = 0.0;
@@ -223,17 +223,16 @@ public abstract class OpMode_5220 extends LinearOpMode
     public static final boolean MUSIC_ON = true;
 
     protected static double voltage = 0;
-    protected static double speed = 0;
-    protected static double integral = 0;
-    protected static double lastError;
-    protected static double lastTime;
-    protected static double lastEncoder;
 
     protected boolean newImage = false;
     private static JavaCameraView openCVView = null;
     private static int width;
     private static int height;
     private static boolean initialized = false;
+
+    protected PIDCalculator voltagePID;
+    protected PIDCalculator velocityPID;
+    protected VelocityCalculator flywheelVelocity;
 
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
@@ -343,6 +342,10 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         phase = RUNNING;
         gameTimer = new Stopwatch();
+
+        velocityPID = new PIDCalculator();
+        voltagePID = new PIDCalculator();
+        flywheelVelocity = new VelocityCalculator();
 
         main();
         end();
@@ -1411,27 +1414,69 @@ public abstract class OpMode_5220 extends LinearOpMode
         return true;
     }
 
+    public class VelocityCalculator
+    {
+        private long time, encoder;
+
+        private long lastEncoder, lastTime;
+
+        public void setParameters(long time, long encoder)
+        {
+            this.time = time;
+            this.encoder = encoder;
+        }
+
+        public double getVelocity()
+        {
+            double velocity = (double) (encoder - lastEncoder) / (time - lastTime);
+
+            lastEncoder = encoder;
+            lastTime = time;
+
+            return velocity;
+        }
+    }
+
+    public class PIDCalculator
+    {
+        private double kP, kI, kD, error, constant;
+        private double lastError;
+        private double integral, derivative;
+
+        public void setParameters(double kP, double kI, double kD, double error, double constant)
+        {
+            this.kP = kP;
+            this.kI = kI;
+            this.kD = kD;
+            this.error = error;
+            this.constant = constant;
+        }
+
+        public double getPID()
+        {
+            derivative = error - lastError;
+            integral += error;
+            lastError = error;
+            return (kP * error) + (kI * integral) + (kD * derivative) + constant;
+        }
+    }
+
     public final void shoot()
     {
-        double vError = TARGET_VOLTAGE - voltage;
-        double vMotorOut = (vError * vP) + .82;
-        vMotorOut = Range.clip(vMotorOut, 0, 1);
+        double voltageError = TARGET_VOLTAGE - voltage;
+        voltagePID.setParameters(vP, 0.0, 0.0, voltageError, 0.82);
+        double voltageOut = voltagePID.getPID();
 
-        double sError = TARGET_SPEED - flywheelSpeed();
-        double derivative = sError - lastError;
-        integral += sError;
-        lastError = sError;
+        flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
+        double velocityError = TARGET_VELOCITY - flywheelVelocity.getVelocity();
 
-        double sMotorOut = (sP * sError) + (sI * integral) + (sD * derivative) + vMotorOut;
-        sMotorOut = Range.clip(sMotorOut, 0.0, 1.0);
-        setMotorPower(flywheelLeft, sMotorOut);
-        setMotorPower(flywheelRight, sMotorOut);
+        velocityPID.setParameters(sP, sI, sD, velocityError, voltageOut);
+        double motorOut = velocityPID.getPID();
+        motorOut = Range.clip(motorOut, 0.0, 1.0);
+        setMotorPower(flywheelLeft, motorOut);
+        setMotorPower(flywheelRight, motorOut);
+
         sleep(30);
-
-        /*
-        setMotorPower(flywheelLeft, 85);
-        setMotorPower(flywheelRight, 85);
-        */
     }
 
     public final void stopShooting()
@@ -1497,7 +1542,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             suspended = false;
             voltage = batteryVoltage();
-            integral = 0;
             notify();
         }
 
@@ -1512,17 +1556,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
     }
 
-    public double flywheelSpeed()
-    {
-        long time = System.nanoTime();
-        long encoder = flywheelRight.getCurrentPosition();
-        double speed = (encoder - lastEncoder) / (time - lastTime);
-
-        lastEncoder = encoder;
-        lastTime = time;
-
-        return speed;
-    }
 
     public double getFloorBrightness ()
     {

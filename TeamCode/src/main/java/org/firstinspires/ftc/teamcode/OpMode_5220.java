@@ -1541,7 +1541,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         synchronized void mResume ()
         {
             suspended = false;
-            voltage = batteryVoltage();
             notify();
         }
 
@@ -1556,6 +1555,41 @@ public abstract class OpMode_5220 extends LinearOpMode
         return this.hardwareMap.voltageSensor.iterator().next().getVoltage();
     }
 
+    public class VoltageThread implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            while(runConditions())
+            {
+                if(driveStopped() && shooterStopped() && sweeperStopped() && liftStopped()) voltage = batteryVoltage();
+            }
+        }
+
+        private boolean driveStopped()
+        {
+            for(DcMotor dcm : driveMotors)
+            {
+                if(dcm.getPower() != 0) return false;
+            }
+            return true;
+        }
+
+        private boolean shooterStopped()
+        {
+            return (flywheelLeft.getPower() == 0 && flywheelLeft.getPower() == 0);
+        }
+
+        private boolean sweeperStopped()
+        {
+            return(sweeperMotor.getPower() == 0);
+        }
+
+        private boolean liftStopped()
+        {
+            return(liftMotor.getPower() == 0);
+        }
+    }
 
     public double getFloorBrightness ()
     {

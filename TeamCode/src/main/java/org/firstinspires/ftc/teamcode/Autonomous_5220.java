@@ -68,6 +68,7 @@ public class Autonomous_5220 extends OpMode_5220
     private boolean runCollector = false;
 
     private ShootThread shoot;
+    private VoltageThread voltage;
 
     public ProgramType getProgramType ()
     {
@@ -783,6 +784,7 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         shoot = new ShootThread();
+        voltage = new VoltageThread();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

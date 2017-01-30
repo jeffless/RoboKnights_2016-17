@@ -60,6 +60,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     private boolean dPadMode = DPAD_DRIVE;
 
     private ShootThread shoot;
+    private VoltageThread voltage;
 
     public ProgramType getProgramType ()
     {
@@ -422,6 +423,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         shoot.start();*/
 
         shoot = new ShootThread();
+        voltage = new VoltageThread();
 
         while (runConditions())
         {

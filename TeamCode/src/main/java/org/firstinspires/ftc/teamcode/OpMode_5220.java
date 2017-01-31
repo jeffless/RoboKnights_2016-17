@@ -1487,7 +1487,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public class ShootThread implements Runnable
     {
-        Thread thrd;
+        private Thread thrd;
 
         private boolean suspended;
         private boolean stopped;
@@ -1557,6 +1557,13 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public class VoltageThread implements Runnable
     {
+        private Thread thrd;
+
+        VoltageThread()
+        {
+            thrd = new Thread(this);
+            thrd.start();
+        }
         @Override
         public void run()
         {

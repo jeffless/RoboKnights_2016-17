@@ -1455,9 +1455,21 @@ public abstract class OpMode_5220 extends LinearOpMode
         public double getPID()
         {
             derivative = error - lastError;
-            integral += error;
+
+            if(((integral+error) * kI < 1.0) && ((integral + error) * kI > 0.0))
+            {
+                integral += error;
+            }
+
             lastError = error;
             return (kP * error) + (kI * integral) + (kD * derivative) + constant;
+        }
+
+        public void resetPID()
+        {
+            lastError = 0;
+            derivative = 0;
+            integral = 0;
         }
     }
 
@@ -1540,6 +1552,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         synchronized void mResume ()
         {
+            velocityPID.resetPID();
             suspended = false;
             notify();
         }

@@ -166,10 +166,13 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double TARGET_VOLTAGE = 12.5;
     protected static final double TARGET_VELOCITY = 1.1e-6;
 
-    protected static final double vP = 0.18;
-    protected static final double sP = 8500;
-    protected static final double sI = 10;
-    protected static final double sD = 0.0;
+    protected static final double VOLTAGE_P = 0.18;
+    protected static final double VOLTAGE_I = 0.0;
+    protected static final double VOLTAGE_D = 0.0;
+
+    protected static final double VELOCITY_P = 8.0;
+    protected static final double VELOCITY_I = 0.024;
+    protected static final double VELOCITY_D = 0.0;
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
@@ -414,7 +417,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
-                telemetry.addData("8", "Voltage " + voltage);
+                telemetry.addData("8", "Velocity: " + flywheelVelocity.getVelocity());
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1439,9 +1442,9 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public class PIDCalculator
     {
-        private double kP, kI, kD, error, constant;
-        private double lastError;
-        private double integral, derivative;
+        private double kP, kI, kD, error, constant = 0;
+        private double lastError = 0;
+        private double integral, derivative = 0;
 
         public void setParameters(double kP, double kI, double kD, double error, double constant)
         {
@@ -1456,9 +1459,14 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             derivative = error - lastError;
 
-            if(((integral+error) * kI < 1.0) && ((integral + error) * kI > 0.0))
+            if(Math.abs(error) < 0.007)
             {
                 integral += error;
+            }
+
+            else
+            {
+                integral = 0;
             }
 
             lastError = error;
@@ -1476,13 +1484,13 @@ public abstract class OpMode_5220 extends LinearOpMode
     public final void shoot()
     {
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(vP, 0.0, 0.0, voltageError, 0.82);
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.82);
         double voltageOut = voltagePID.getPID();
 
         flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
-        double velocityError = TARGET_VELOCITY - flywheelVelocity.getVelocity();
+        double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
 
-        velocityPID.setParameters(sP, sI, sD, velocityError, voltageOut);
+        velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
         double motorOut = velocityPID.getPID();
         motorOut = Range.clip(motorOut, 0.0, 1.0);
         setMotorPower(flywheelLeft, motorOut);
@@ -1577,6 +1585,7 @@ public abstract class OpMode_5220 extends LinearOpMode
             thrd = new Thread(this);
             thrd.start();
         }
+
         @Override
         public void run()
         {

@@ -62,7 +62,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     private boolean color = RED; //arbitrary default
     private int startPosition = START_NORMAL;
-    private boolean thirdBallOn = true;
+    private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private int endPath = END_BALL;
     private boolean runCollector = false;
@@ -491,8 +491,8 @@ public class Autonomous_5220 extends OpMode_5220
         if(color == BLUE)
         {
             move(-4, 0.4);
-            rotateEncoder(-10.5);
-            move(-25.3, 0.6);
+            rotateEncoder(-10.1);
+            move(-23.5, 0.6);
         }
 
         else if(color == RED)
@@ -504,7 +504,7 @@ public class Autonomous_5220 extends OpMode_5220
 
             move(4, 0.4);
             rotateEncoder(6.8);
-            move(20.3, 0.6);
+            move(18, 0.6);
         }
     }
 
@@ -652,7 +652,7 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == BLUE)
         {
             strafe(-17.3);
-            rotateEncoder(-4.2);
+            rotateEncoder(-5.3);
             move(-50);
         }
 

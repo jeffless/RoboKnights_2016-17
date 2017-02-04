@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -153,7 +154,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double DOOR_INIT = 0.8;
     protected static final double DOOR_CLOSED = 1.0;
 
-    protected static final double RP_IN = 0.0;
+    protected static final double RP_IN = 0.01;
     protected static final double RP_RELEASE = 0.1;
     protected static final double RP_OUT = 0.4;
 
@@ -170,8 +171,10 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 
-    protected static final double VELOCITY_P = 8.0;
-    protected static final double VELOCITY_I = 0.024;
+    //protected static final double VELOCITY_P = 7.2;
+    //protected static final double VELOCITY_I = 0.014;
+    protected static final double VELOCITY_P = 0.37;
+    protected static final double VELOCITY_I = 0.1;
     protected static final double VELOCITY_D = 0.0;
 
     protected static final double ST_1 = 0.0;
@@ -417,7 +420,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
-                telemetry.addData("8", "Velocity: " + flywheelVelocity.getVelocity());
+                telemetry.addData("9", "Voltage: " + voltage);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1419,9 +1422,9 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public class VelocityCalculator
     {
-        private long time, encoder;
+        private long time, encoder = 0;
 
-        private long lastEncoder, lastTime;
+        private long lastEncoder, lastTime = 0;
 
         public void setParameters(long time, long encoder)
         {
@@ -1457,9 +1460,34 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         public double getPID()
         {
+            /*
+            if(error > 0.006)
+            {
+                return constant;
+            }
+
+            else
+            {
+                derivative = error - lastError;
+
+                if (Math.abs(error) < 0.006)
+                {
+                    integral += error;
+                }
+
+                else
+                {
+                    integral = 0;
+                }
+
+                lastError = error;
+                return (kP * error) + (kI * integral) + (kD * derivative) + constant;
+            }
+            */
+
             derivative = error - lastError;
 
-            if(Math.abs(error) < 0.007)
+            if (Math.abs(error) < 0.006)
             {
                 integral += error;
             }
@@ -1488,7 +1516,9 @@ public abstract class OpMode_5220 extends LinearOpMode
         double voltageOut = voltagePID.getPID();
 
         flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
-        double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
+        //double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
+        double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
+        Log.wtf("mai error", String.valueOf(velocityError));
 
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
         double motorOut = velocityPID.getPID();

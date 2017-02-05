@@ -179,10 +179,15 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                     if (frontPower == 0 && backPower == 0) {
                         if (dPadMode == DPAD_DRIVE) {
-                            if (gamepad1.dpad_up) setDrivePower(-0.34);
+                            /*if (gamepad1.dpad_up) setDrivePower(-0.34);
                             else if (gamepad1.dpad_down) setDrivePower(0.34);
                             else if (gamepad1.dpad_right) setStrafePower(0.40);
                             else if (gamepad1.dpad_left) setStrafePower(-0.40);
+                            */
+                            if (gamepad1.dpad_up) setDrivePower(-0.21);
+                            else if (gamepad1.dpad_down) setDrivePower(0.21);
+                            else if (gamepad1.dpad_right) setStrafePower(0.34);
+                            else if (gamepad1.dpad_left) setStrafePower(-0.34);
                             else setDrivePower(0);
                         } else {
                             setDrivePower(0);

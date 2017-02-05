@@ -619,7 +619,7 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == BLUE)
         {
             //move(12, 0.7);
-            move(7, 0.7);
+            move(10);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -633,7 +633,7 @@ public class Autonomous_5220 extends OpMode_5220
                 setSweeperPower(0.95);
             }
 
-            move (-13);
+            move (-10);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -721,7 +721,14 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-
+            move(9.6);
+            rotateEncoder(25);
+            strafe(-5);
+            //while (gameTimer.time() < 10000);
+            shootAutonomousBalls();
+            while (gameTimer.time() < 19000);
+            rotateEncoder(-8.7);
+            moveTime (4000, 0.9);
         }
     }
 

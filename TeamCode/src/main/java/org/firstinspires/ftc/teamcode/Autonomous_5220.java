@@ -48,13 +48,17 @@ import com.qualcomm.robotcore.util.Range;
 public class Autonomous_5220 extends OpMode_5220
 {
     public static final int START_NORMAL = 0;
-    public static final int START_SHOOT_ONLY = 1;
+    public static final int START_FAR = 1;
     public static final int NUM_STARTS = 2;
 
-    public static final int END_BALL = 0;
-    public static final int END_BLOCK = 1;
-    public static final int END_SHOOT = 2;
-    public static final int NUM_ENDS = 3;
+    public static final int END_NORMAL_CAP_BALL = 0;
+    public static final int END_NORMAL_BLOCK = 1;
+    public static final int END_NORMAL_SHOOT = 2;
+    public static final int END_FAR_RAMP = 3;
+    public static final int END_FAR_CAP_BALL = 4;
+    public static final int END_FAR_BLOCK_BALL = 5;
+    public static final int END_FAR_BLOCK_BEACON = 6;
+    public static final int NUM_ENDS = 7;
 
     private double overLineTime = 950;
 
@@ -64,7 +68,7 @@ public class Autonomous_5220 extends OpMode_5220
     private int startPosition = START_NORMAL;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
-    private int endPath = END_BALL;
+    private int endPath = END_NORMAL_CAP_BALL;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -279,7 +283,7 @@ public class Autonomous_5220 extends OpMode_5220
             switch (s)
             {
                 case START_NORMAL: return "NORMAL";
-                case START_SHOOT_ONLY: return "SHOOT ONLY (near corner)";
+                case START_FAR: return "FAR (away from corner vortex)";
                 default: return "Error: Start Position Number.";
             }
         }
@@ -288,9 +292,13 @@ public class Autonomous_5220 extends OpMode_5220
         {
             switch (s)
             {
-                case END_BALL: return "CAP BALL";
-                case END_BLOCK: return "BEACON DEFENSE";
-                case END_SHOOT: return "SHOOTING";
+                case END_NORMAL_CAP_BALL: return "NORMAL: CAP BALL";
+                case END_NORMAL_BLOCK: return "NORMAL: BEACON DEFENSE";
+                case END_NORMAL_SHOOT: return "NORMAL: SHOOTING";
+                case END_FAR_RAMP: return "FAR: RAMP";
+                case END_FAR_CAP_BALL: return "FAR: CAP BALL";
+                case END_FAR_BLOCK_BALL: return "FAR: BLOCK CAP BALL";
+                case END_FAR_BLOCK_BEACON: return "FAR: BLOCK BEACON";
                 default: return "Error: End Path Number.";
             }
         }
@@ -470,7 +478,7 @@ public class Autonomous_5220 extends OpMode_5220
             }
         }
 
-        else if (startPosition == START_SHOOT_ONLY)
+        else if (startPosition == START_FAR)
         {
             if (color == BLUE)
             {
@@ -712,7 +720,7 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void shootOnly () //UNFINISHED
+    private void farStartToShootingPosition () //UNFINISHED
     {
         if(color == BLUE)
         {
@@ -724,50 +732,112 @@ public class Autonomous_5220 extends OpMode_5220
             move(9.6);
             rotateEncoder(25);
             strafe(-5);
-            //while (gameTimer.time() < 10000);
-            shootAutonomousBalls();
-            while (gameTimer.time() < 19000);
-            rotateEncoder(-8.7);
-            moveTime (4000, 0.9);
         }
     }
 
     public void autonomous ()
     {
-        if (thirdBallOn) getThirdBall();
-        sleep(200);
-
-        if(startPosition == START_SHOOT_ONLY) //UNTESTED
+        if(startPosition == START_FAR) //EVERYTHING HERE IS UNTESTED
         {
-            shootOnly();
-            stopDrivetrain();
-            shoot.mStop();
-            return;
+            farStartToShootingPosition();
+            shootAutonomousBalls();
+
+            if (endPath == END_FAR_RAMP)
+            {
+                if (color == RED)
+                {
+                    while (gameTimer.time() < 19000);
+                    rotateEncoder(-8.7);
+                    moveTime (4000, 0.9);
+                }
+
+                else if (color == BLUE)
+                {
+
+                }
+
+            }
+
+            else if (endPath == END_FAR_CAP_BALL)
+            {
+                if (color == RED)
+                {
+                    rotateEncoder(-15);
+                    move (32);
+                }
+
+                else if (color == BLUE)
+                {
+
+                }
+
+            }
+
+            else if (endPath == END_FAR_BLOCK_BALL)
+            {
+                if (color == RED)
+                {
+                    while (gameTimer.time() < 10750);
+                    move (-20);
+                    strafe (12);
+                }
+
+                else if (color == BLUE)
+                {
+
+                }
+
+            }
+
+            else if (endPath == END_FAR_BLOCK_BEACON) //if this works, it'll be OP when both our partner and at least one of our opponents has a full autonomous like ours, which takes more than ~12 seconds to reach the far beacon
+            {
+                if (color == RED)
+                {
+                    rotateEncoder(-15);
+                    move (32);
+                    while (gameTimer.time() < 10750);
+                    rotateEncoder(10);
+                    strafeTime(5000, 1.0);
+                }
+
+                else if (color == BLUE)
+                {
+
+                }
+            }
+
         }
-
-        startToShootingPosition();
-        sleep(200);
-        shootAutonomousBalls();
-        sleep(100);
-        shootingPositionToWall();
-        pushButtonsAlongWall();
-
-        if (endPath == END_BLOCK)
+        
+        else if (startPosition == START_NORMAL)
         {
-            farBeaconToOpponent();
-        }
+            if (thirdBallOn) getThirdBall();
+            sleep(200);
 
-        else if (endPath == END_SHOOT)
-        {
-            alignWithFarLine();
-            farBeaconToBallWithShooting();
-        }
-        else if (endPath == END_BALL)
-        {
-            alignWithFarLine();
-            farBeaconToBall();
-        }
+            startToShootingPosition();
+            sleep(200);
+            shootAutonomousBalls();
+            sleep(100);
+            shootingPositionToWall();
+            pushButtonsAlongWall();
 
+            if (endPath == END_NORMAL_BLOCK)
+            {
+                farBeaconToOpponent();
+            }
+
+            else if (endPath == END_NORMAL_SHOOT)
+            {
+                alignWithFarLine();
+                farBeaconToBallWithShooting();
+            }
+            else if (endPath == END_NORMAL_CAP_BALL)
+            {
+                alignWithFarLine();
+                farBeaconToBall();
+            }
+
+
+        }
 
         stopDrivetrain();
         shoot.mStop();

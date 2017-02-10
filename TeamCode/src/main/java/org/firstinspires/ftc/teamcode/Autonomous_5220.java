@@ -49,7 +49,8 @@ public class Autonomous_5220 extends OpMode_5220
 {
     public static final int START_NORMAL = 0;
     public static final int START_FAR = 1;
-    public static final int NUM_STARTS = 2;
+    public static final int START_AIM = 2;
+    public static final int NUM_STARTS = 3;
 
     public static final int END_NORMAL_CAP_BALL = 0;
     public static final int END_NORMAL_BLOCK = 1;
@@ -58,7 +59,9 @@ public class Autonomous_5220 extends OpMode_5220
     public static final int END_FAR_CAP_BALL = 4;
     public static final int END_FAR_BLOCK_BALL = 5;
     public static final int END_FAR_BLOCK_BEACON = 6;
-    public static final int NUM_ENDS = 7;
+    public static final int END_AIM_CAP_BALL = 7;
+    public static final int END_AIM_RAMP = 8;
+    public static final int NUM_ENDS = 9;
 
     private double overLineTime = 950;
 
@@ -284,6 +287,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 case START_NORMAL: return "NORMAL";
                 case START_FAR: return "FAR (away from corner vortex)";
+                case START_AIM: return "AIM (angled at the far beacon line)";
                 default: return "Error: Start Position Number.";
             }
         }
@@ -299,6 +303,8 @@ public class Autonomous_5220 extends OpMode_5220
                 case END_FAR_CAP_BALL: return "FAR: CAP BALL";
                 case END_FAR_BLOCK_BALL: return "FAR: BLOCK CAP BALL";
                 case END_FAR_BLOCK_BEACON: return "FAR: BLOCK BEACON";
+                case END_AIM_CAP_BALL: return "AIM: CAP BALL";
+                case END_AIM_RAMP: return "AIM: RAMP";
                 default: return "Error: End Path Number.";
             }
         }
@@ -490,6 +496,19 @@ public class Autonomous_5220 extends OpMode_5220
                 //UNFINISHED
             }
         }
+
+        else if (startPosition == START_AIM)
+        {
+            if (color == BLUE)
+            {
+                //UNFINISHED
+            }
+
+            else if (color == RED)
+            {
+                //UNFINISHED
+            }
+        }
     }
 
     private void startToShootingPosition()
@@ -560,21 +579,55 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-
-    private void findButton()
+    private void startToFarBeacon()
     {
         if (color == BLUE)
         {
-            diagonalStrafeAgainstWall(FORWARDS);
-            while (runConditions() && colorSensorFront.blue() < 3) ;
-            stopDrivetrain();
+            setDrivePower(0.9);
+            waitForLine();
         }
 
         else if (color == RED)
         {
-            diagonalStrafeAgainstWall(BACKWARDS);
-            while (runConditions() && colorSensorFront.red() < 2) ;
-            stopDrivetrain();
+            setDrivePower(0.9);
+            waitForLine();
+        }
+    }
+
+    private void findButton()
+    {
+        if(startPosition == START_NORMAL || startPosition == START_NORMAL)
+        {
+            if (color == BLUE)
+            {
+                diagonalStrafeAgainstWall(FORWARDS);
+                while (runConditions() && colorSensorFront.blue() < 3) ;
+                stopDrivetrain();
+            }
+
+            else if (color == RED)
+            {
+                diagonalStrafeAgainstWall(BACKWARDS);
+                while (runConditions() && colorSensorFront.red() < 2) ;
+                stopDrivetrain();
+            }
+        }
+
+        else if(startPosition == START_AIM)
+        {
+            if (color == BLUE)
+            {
+                diagonalStrafeAgainstWall(BACKWARDS);
+                while (runConditions() && colorSensorFront.blue() < 3) ;
+                stopDrivetrain();
+            }
+
+            else if (color == RED)
+            {
+                diagonalStrafeAgainstWall(FORWARDS);
+                while (runConditions() && colorSensorFront.red() < 2) ;
+                stopDrivetrain();
+            }
         }
     }
 
@@ -592,30 +645,66 @@ public class Autonomous_5220 extends OpMode_5220
 
         findButton();
 
-        if(color == RED)
+        if(startPosition == START_NORMAL || startPosition == START_FAR)
         {
-            //move(1.8);
+            if(color == RED)
+            {
+
+            }
+
+            if(color == BLUE)
+            {
+                move(0.9);
+            }
         }
 
-        if(color == BLUE)
+        else if(startPosition == START_AIM)
         {
-            move(0.9);
+            if(color == RED)
+            {
+                move(0.9);
+            }
+
+            if(color == BLUE)
+            {
+
+            }
         }
 
         pushButton();
         sleep(200);
-        move (color == BLUE ? 18: -20);
+
+        if(startPosition == START_NORMAL || startPosition == START_FAR) move (color == BLUE ? 18: -20);
+        else if(startPosition == START_AIM) move(color == BLUE ? -18: 20);
+
         findButton();
 
-        if(color == RED)
+        if(startPosition == START_NORMAL || startPosition == START_FAR)
         {
-            //move(1.8);
+            if(color == RED)
+            {
+
+            }
+
+            if(color == BLUE)
+            {
+                move(0.9);
+            }
         }
 
-        if(color == BLUE)
+        else if(startPosition == START_AIM)
         {
-            move(0.9);
+            if(color == RED)
+            {
+                //UNFINISHED
+            }
+
+            if(color == BLUE)
+            {
+                //UNFINISHED
+            }
         }
+
 
         pushButton();
         setSweeperPower(0);
@@ -626,7 +715,6 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            //move(12, 0.7);
             move(10);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
@@ -735,6 +823,45 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
+    private void closeBeaconToShootingPosition() //UNFINISHED
+    {
+        if(color == BLUE)
+        {
+
+        }
+
+        else if(color ==  RED)
+        {
+
+        }
+    }
+
+    private void shootingPositionToRamp() //UNTESTED
+    {
+        if(color == BLUE)
+        {
+
+        }
+
+        else if(color ==  RED)
+        {
+
+        }
+    }
+
+    private void shootingPositiongToCapBall() //UNTESTEd
+    {
+        if(color == BLUE)
+        {
+
+        }
+
+        else if(color ==  RED)
+        {
+
+        }
+    }
+
     public void autonomous ()
     {
         if(startPosition == START_FAR) //EVERYTHING HERE IS UNTESTED
@@ -814,7 +941,7 @@ public class Autonomous_5220 extends OpMode_5220
             sleep(200);
 
             startToShootingPosition();
-            sleep(200);
+            sleep(800);
             shootAutonomousBalls();
             sleep(100);
             shootingPositionToWall();
@@ -835,8 +962,27 @@ public class Autonomous_5220 extends OpMode_5220
                 alignWithFarLine();
                 farBeaconToBall();
             }
+        }
 
+        else if(startPosition == START_AIM)
+        {
+            startToFarBeacon();
+            pushButtonsAlongWall();
 
+            closeBeaconToShootingPosition();
+            sleep(800);
+            shootAutonomousBalls();
+            sleep(100);
+
+            if(endPath == END_AIM_CAP_BALL)
+            {
+                shootingPositiongToCapBall();
+            }
+
+            else if(endPath == END_AIM_RAMP)
+            {
+                shootingPositionToRamp();
+            }
         }
 
         stopDrivetrain();

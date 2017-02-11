@@ -76,7 +76,6 @@ import java.util.concurrent.RunnableFuture;
 //Currently using FTC SDK 2.2
 
 public abstract class OpMode_5220 extends LinearOpMode
-        implements CameraBridgeViewBase.CvCameraViewListener2
 {
     //CONSTANTS:
 
@@ -229,7 +228,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     public static final boolean MUSIC_ON = true;
 
     protected static double voltage = 0;
-    //protected static double displayVelocity = 0;
 
     protected boolean newImage = false;
     private static JavaCameraView openCVView = null;
@@ -424,7 +422,6 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
                 telemetry.addData("9", "Voltage: " + voltage);
-                //telemetry.addData("10", "Velocity: " + displayVelocity);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1755,105 +1752,5 @@ public abstract class OpMode_5220 extends LinearOpMode
             }
         }
         telemetry.update();
-    }
-
-    private void initializeCameraView()
-    {
-        final Activity mActivity = (Activity) hardwareMap.appContext;
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        class CameraThread implements Runnable
-        {
-            private JavaCameraView mCameraView = null;
-            public JavaCameraView getJCV() {return mCameraView;}
-
-            public void run()
-            {
-                mCameraView = new JavaCameraView(mActivity, CameraBridgeViewBase.CAMERA_ID_BACK);
-                mCameraView.setMaxFrameSize(480, 320);
-
-                ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                mCameraView.setLayoutParams(params);
-
-                ViewGroup img = (ViewGroup) mActivity.findViewById(R.id.cameraMonitorViewId);
-                img.addView(mCameraView, 0);
-            }
-        }
-
-        CameraThread cameraThread = new CameraThread();
-        mActivity.runOnUiThread(cameraThread);
-
-        JavaCameraView mCameraView = null;
-        while(mCameraView == null)
-        {
-            mCameraView = cameraThread.getJCV();
-        }
-
-        openCVView = mCameraView;
-        openCVView.setVisibility(CameraBridgeViewBase.VISIBLE);
-        openCVView.setCvCameraViewListener(this);
-
-        width = openCVView.getMeasuredWidth();
-        height = openCVView.getMeasuredHeight();
-    }
-
-    protected void initializeOpenCV()
-    {
-        BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(hardwareMap.appContext)
-        {
-            @Override
-            public void onManagerConnected(int status)
-            {
-                switch (status)
-                {
-                    case LoaderCallbackInterface.SUCCESS:
-                    {
-                        initializeCameraView();
-                        openCVView.enableView();
-                    } break;
-                    default:
-                    {
-                        super.onManagerConnected(status);
-                    } break;
-                }
-            }
-        };
-
-        if(!OpenCVLoader.initDebug())
-        {
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, hardwareMap.appContext, mLoaderCallback);
-        }
-
-        else
-        {
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-    }
-
-    protected void endCamera()
-    {
-        openCVView.disableView();
-    }
-    @Override
-    public void onCameraViewStarted(int width, int height)
-    {
-
-    }
-
-    @Override
-    public void onCameraViewStopped()
-    {
-        openCVView.disableView();
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
-    {
-        Mat rgb = inputFrame.rgba();
-        newImage = true;
-
-        Mat rtrnImage = rgb;
-
-        return rtrnImage;
     }
 }

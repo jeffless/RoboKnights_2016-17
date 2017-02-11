@@ -531,6 +531,13 @@ public abstract class OpMode_5220 extends LinearOpMode
         if (yaw < 0.0) toReturn = 360 + yaw;
         return toReturn;
     }
+
+    public double normalizeIMUHeading()
+    {
+        double yaw = navX.getYaw();
+        if(yaw < 0) return 360 - (Math.abs(yaw % 360));
+        else return (yaw%360);
+    }
 /*
     public void restartRobot()
     {

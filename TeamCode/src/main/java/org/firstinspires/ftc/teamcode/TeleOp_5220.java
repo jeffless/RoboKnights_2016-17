@@ -52,9 +52,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     private static final int SHOOTER_FIRING = 2;
     private boolean fireWhenReady = false;
 
-    private double temp, theta;
-    private double leftFront, leftBack, rightBack, rightFront;
-
     private static final boolean DPAD_LIFT = false;
     private static final boolean DPAD_DRIVE = true;
     private boolean dPadMode = DPAD_DRIVE;
@@ -224,41 +221,26 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             else
             {
                 double throttle = ((gamepad1.left_stick_y - g1Stick1Yinit));
-                double direction = (-(gamepad1.left_stick_x - g1Stick1Xinit));
-                double strafe = (gamepad1.right_stick_x - g1Stick1Xinit);
+                double strafe = (-(gamepad1.left_stick_x - g1Stick1Xinit));
+                double direction  = (-(gamepad1.right_stick_x - g1Stick1Xinit));
 
-                theta = Math.toRadians(navX.getYaw());
+                double heading = normalizeIMUHeading();
 
-                temp = throttle * Math.cos(theta) - strafe * Math.sin(theta);
-                strafe = throttle * Math.sin(theta) + strafe * Math.cos(theta);
-                throttle = temp;
+                double cosHeading = Math.cos(Math.toRadians(heading));
+                double sinHeading = Math.cos(Math.toRadians(heading));
 
-                leftFront = throttle + direction + strafe;
-                leftBack = throttle + direction - strafe;
-                rightBack = throttle - direction + strafe;
-                rightFront = throttle - direction - strafe;
+                double xOut = strafe * cosHeading - throttle * sinHeading;
+                double yOut = strafe * sinHeading + throttle * cosHeading;
 
-                leftFront = Range.clip(leftFront, -2, 2);
-                leftBack = Range.clip(leftBack, -2, 2);
-                rightBack = Range.clip(rightBack, -2, 2);
-                rightFront = Range.clip(rightFront, -2, 2);
+                double leftFront = yOut + xOut + direction;
+                double leftBack = yOut - xOut + direction;
+                double rightBack = yOut + xOut - direction;
+                double rightFront = yOut - xOut - direction;
 
-                boolean powersZero = true;
-                if (Math.abs(leftFront) < 0.05) {
-                    leftFront = 0;
-                }
-
-                if (Math.abs(leftBack) < 0.05) {
-                    leftBack = 0;
-                }
-
-                if (Math.abs(rightBack) < 0.05) {
-                    rightBack = 0;
-                }
-
-                if (Math.abs(rightFront) < 0.05) {
-                    rightFront = 0;
-                }
+                leftFront = Range.clip(leftFront, -1, 1);
+                leftBack = Range.clip(leftBack, -1, 1);
+                rightBack = Range.clip(rightBack, -1, 1);
+                rightFront = Range.clip(rightFront, -1, 1);
 
                 setMotorPower(leftFrontMotor, leftFront);
                 setMotorPower(leftBackMotor, leftBack);
@@ -269,6 +251,11 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             if (gamepad1.back && !prevGamepad1.back)
             {
                 dPadMode = !dPadMode;
+            }
+
+            if(gamepad1.guide && !prevGamepad1.guide)
+            {
+                fieldOrient = !fieldOrient;
             }
 
             if ((gamepad1.a && !prevGamepad1.a) || (gamepad2.a && !prevGamepad2.a) || fireWhenReady)

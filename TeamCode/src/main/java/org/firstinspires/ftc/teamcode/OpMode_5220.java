@@ -229,6 +229,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     public static final boolean MUSIC_ON = true;
 
     protected static double voltage = 0;
+    //protected static double displayVelocity = 0;
 
     protected boolean newImage = false;
     private static JavaCameraView openCVView = null;
@@ -238,6 +239,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected PIDCalculator voltagePID;
     protected PIDCalculator velocityPID;
+    protected BangBangCalculator velocityBangBang;
     protected VelocityCalculator flywheelVelocity;
 
 
@@ -351,6 +353,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         velocityPID = new PIDCalculator();
         voltagePID = new PIDCalculator();
+        velocityBangBang = new BangBangCalculator();
         flywheelVelocity = new VelocityCalculator();
 
         main();
@@ -421,6 +424,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
                 telemetry.addData("9", "Voltage: " + voltage);
+                //telemetry.addData("10", "Velocity: " + displayVelocity);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1516,6 +1520,37 @@ public abstract class OpMode_5220 extends LinearOpMode
         }
     }
 
+    public class BangBangCalculator
+    {
+        private double target = 0;
+        private double velocity = 0;
+        private double lowerPower, higherPower = 0;
+        private double tolerance = 0;
+
+        public void setParameters(double target, double velocity, double lowerPower, double higherPower, double tolerance)
+        {
+            this.target = target;
+            this.velocity = velocity;
+            this.lowerPower = lowerPower;
+            this.higherPower = higherPower;
+            this.tolerance = tolerance;
+        }
+
+        public double getBangBang()
+        {
+            if(velocity >= (target + tolerance))
+            {
+                return lowerPower;
+            }
+
+            else
+            {
+                return higherPower;
+            }
+        }
+    }
+
+
     public final void shoot()
     {
         double voltageError = TARGET_VOLTAGE - voltage;
@@ -1524,11 +1559,16 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
         //double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
-        double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
+
+        /*double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
         Log.wtf("mai error", String.valueOf(velocityError));
 
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
-        double motorOut = velocityPID.getPID();
+        double motorOut = velocityPID.getPID();*/
+
+        velocityBangBang.setParameters(flywheelVelocity.getVelocity(), TARGET_VELOCITY, voltageOut, 0.95, 0.0);
+        double motorOut = velocityBangBang.getBangBang();
+
         motorOut = Range.clip(motorOut, 0.0, 1.0);
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);

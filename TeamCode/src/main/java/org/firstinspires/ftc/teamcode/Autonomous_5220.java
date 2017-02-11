@@ -468,8 +468,7 @@ public class Autonomous_5220 extends OpMode_5220
                 setSweeperPower(1);
                 sleep(800);
                 strafe(-4);
-                rotateEncoder(-18.8);
-                moveTime(1200, 0.3);
+                rotateEncoder(-13.8);
                 setSweeperPower(0);
             }
 
@@ -478,8 +477,7 @@ public class Autonomous_5220 extends OpMode_5220
                 setSweeperPower(1);
                 sleep(800);
                 strafe(4);
-                rotateEncoder(-18.8);
-                moveTime(1200, -0.3);
+                rotateEncoder(-23.8);
                 setSweeperPower(0);
             }
         }
@@ -488,12 +486,20 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                //UNFINISHED
+                setSweeperPower(1);
+                sleep(800);
+                strafe(4);
+                rotateEncoder(-23.8);
+                setSweeperPower(0);
             }
 
             else if (color == RED)
             {
-                //UNFINISHED
+                setSweeperPower(1);
+                sleep(800);
+                strafe(4);
+                rotate(-13.8);
+                setSweeperPower(0);
             }
         }
 
@@ -501,12 +507,12 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                //UNFINISHED
+               //SHOULD NEVER HAPPEN
             }
 
             else if (color == RED)
             {
-                //UNFINISHED
+                //SHOULD NEVER HAPPEN
             }
         }
     }
@@ -515,23 +521,34 @@ public class Autonomous_5220 extends OpMode_5220
     {
         setSweeperPower(0);
 
-        if(color == BLUE)
+        if(!thirdBallOn)
         {
-            move(-4, 0.4);
-            rotateEncoder(-10.1);
-            move(-23.5, 0.6);
+            if(color == BLUE)
+            {
+                move(-4, 0.4);
+                rotateEncoder(-10.1);
+                move(-23.5, 0.6);
+            }
+
+            else if(color == RED)
+            {
+                move(4, 0.4);
+                rotateEncoder(6.8);
+                move(18, 0.6);
+            }
         }
 
-        else if(color == RED)
+        if(thirdBallOn)
         {
-            /*move(-4, 0.4);
-            rotateEncoder(-27.4);
-            move(19.8, 0.6);
-            */
+            if(color == BLUE)
+            {
+                move(-23.5, 0.6);
+            }
 
-            move(4, 0.4);
-            rotateEncoder(6.8);
-            move(18, 0.6);
+            else if(color == RED)
+            {
+                move(18, 0.6);
+            }
         }
     }
 
@@ -543,8 +560,6 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(-30.0, 0.7);
             move (5);
             strafeTime(800, 0.7);
-            diagonalStrafeAgainstWall(BACKWARDS);
-            sleep(800);
             stopDrivetrain();
         }
 
@@ -554,9 +569,6 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(22.0, 0.7);
             move(-3);
             strafeTime(1000, 0.7);
-            diagonalStrafeAgainstWall(FORWARDS);
-            sleep(900);
-
             stopDrivetrain();
         }
     }
@@ -585,18 +597,23 @@ public class Autonomous_5220 extends OpMode_5220
         {
             setDrivePower(0.9);
             waitForLine();
+            move(7);
+            rotateEncoder(9);
+            strafe(-17);
         }
 
         else if (color == RED)
         {
             setDrivePower(0.9);
             waitForLine();
+            rotateEncoder(-9);
+            strafe(17);
         }
     }
 
     private void findButton()
     {
-        if(startPosition == START_NORMAL || startPosition == START_NORMAL)
+        if(startPosition == START_NORMAL || startPosition == START_FAR)
         {
             if (color == BLUE)
             {
@@ -934,7 +951,7 @@ public class Autonomous_5220 extends OpMode_5220
             }
 
         }
-        
+
         else if (startPosition == START_NORMAL)
         {
             if (thirdBallOn) getThirdBall();

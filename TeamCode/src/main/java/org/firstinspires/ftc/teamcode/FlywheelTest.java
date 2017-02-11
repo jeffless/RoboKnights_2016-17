@@ -67,9 +67,21 @@ public class FlywheelTest extends LinearOpMode
 
         waitForStart();
 
+        while(opModeIsActive())
+        {
+            flywheelRight.setPower(0.82);
+            flywheelLeft.setPower(0.82);
+            flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
+            double currentVelocity = flywheelVelocity.getVelocity();
+
+            telemetry.addData("Velocity: ", currentVelocity);
+            sleep(30);
+        }
+
         /*
         PID Example
          */
+        /*
         while(opModeIsActive())
         {
             flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
@@ -83,10 +95,12 @@ public class FlywheelTest extends LinearOpMode
             flywheelLeft.setPower(motorOut);
             flywheelRight.setPower(motorOut);
         }
+        */
 
         /*
         Bang Bang Example
          */
+        /*
         while(opModeIsActive())
         {
             flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
@@ -99,13 +113,14 @@ public class FlywheelTest extends LinearOpMode
             flywheelLeft.setPower(motorOut);
             flywheelRight.setPower(motorOut);
         }
+        */
     }
 
     public class PIDCalculator
     {
-        private double kP, kI, kD, error, constant;
-        private double lastError;
-        private double integral, derivative;
+        private double kP, kI, kD, error, constant = 0;
+        private double lastError = 0;
+        private double integral, derivative = 0;
 
         public void setParameters(double kP, double kI, double kD, double error, double constant)
         {
@@ -127,10 +142,10 @@ public class FlywheelTest extends LinearOpMode
 
     public class BangBangCalculator
     {
-        private double target;
-        private double velocity;
-        private double lowerPower, higherPower;
-        private double tolerance;
+        private double target = 0;
+        private double velocity = 0;
+        private double lowerPower, higherPower = 0;
+        private double tolerance = 0;
 
         public void setParameters(double target, double velocity, double lowerPower, double higherPower, double tolerance)
         {
@@ -157,9 +172,9 @@ public class FlywheelTest extends LinearOpMode
 
     public class VelocityCalculator
     {
-        private long time, encoder;
+        private long time, encoder = 0;
 
-        private long lastEncoder, lastTime;
+        private long lastEncoder, lastTime = 0;
 
         public void setParameters(long time, long encoder)
         {

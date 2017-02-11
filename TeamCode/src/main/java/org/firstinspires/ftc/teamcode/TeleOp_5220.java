@@ -227,7 +227,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 double heading = normalizeIMUHeading();
 
                 double cosHeading = Math.cos(Math.toRadians(heading));
-                double sinHeading = Math.cos(Math.toRadians(heading));
+                double sinHeading = Math.sin(Math.toRadians(heading));
 
                 double xOut = strafe * cosHeading - throttle * sinHeading;
                 double yOut = strafe * sinHeading + throttle * cosHeading;

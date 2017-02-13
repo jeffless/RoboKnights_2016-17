@@ -884,6 +884,7 @@ public class Autonomous_5220 extends OpMode_5220
         if(startPosition == START_FAR) //EVERYTHING HERE IS UNTESTED
         {
             farStartToShootingPosition();
+            sleep(800);
             shootAutonomousBalls();
 
             if (endPath == END_FAR_RAMP)

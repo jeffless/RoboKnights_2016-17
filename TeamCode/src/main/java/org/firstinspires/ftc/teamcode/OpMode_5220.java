@@ -229,11 +229,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static double voltage = 0;
 
-    protected boolean newImage = false;
-    private static JavaCameraView openCVView = null;
-    private static int width;
-    private static int height;
-    private static boolean initialized = false;
 
     protected PIDCalculator voltagePID;
     protected PIDCalculator velocityPID;

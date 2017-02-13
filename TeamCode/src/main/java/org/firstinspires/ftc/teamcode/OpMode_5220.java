@@ -116,10 +116,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     protected static final int ENCODER_COUNTS_PER_ROTATION = 1120; //WAS 1440
 
-    protected static double temp = 0;
-    protected static double right = 0;
-    protected static double theta = 0;
-
     //CONFIGURABLE CONSTANTS:
 
     protected static final boolean TIMER_ON = false; //ALWAYS KEEP THIS OFF UNTIL/UNLESS WE DECIDE TO USE IT AND FIX THE CODE FOR USING THE IN-CODE TIME LIMIT (in runConditions)
@@ -153,12 +149,12 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double DOOR_INIT = 0.8;
     protected static final double DOOR_CLOSED = 1.0;
 
-    protected static final double RP_IN = 0.01;
-    protected static final double RP_RELEASE = 0.1;
-    protected static final double RP_OUT = 0.4;
+    protected static final double RP_IN = 0.0;
+    protected static final double RP_RELEASE = 0.04;
+    protected static final double RP_OUT = 0.12;
 
-    protected static final double HOOK_IN = 0.92;
-    protected static final double HOOK_RELEASE = 0.6;
+    protected static final double HOOK_IN = 0.6;
+    protected static final double HOOK_RELEASE = 0.96;
 
     protected static final double CLAMP_IN = 1.0;
     protected static final double CLAMP_DOWN = 0.93;
@@ -172,7 +168,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     //protected static final double VELOCITY_P = 7.2;
     //protected static final double VELOCITY_I = 0.014;
-    protected static final double VELOCITY_P = 0.37;
+    protected static final double VELOCITY_P = 0.52;
     protected static final double VELOCITY_I = 0.1;
     protected static final double VELOCITY_D = 0.0;
 
@@ -1552,20 +1548,20 @@ public abstract class OpMode_5220 extends LinearOpMode
         flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
         //double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
 
-        /*double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
+        double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
         Log.wtf("mai error", String.valueOf(velocityError));
 
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
-        double motorOut = velocityPID.getPID();*/
+        double motorOut = velocityPID.getPID();
 
-        velocityBangBang.setParameters(flywheelVelocity.getVelocity(), TARGET_VELOCITY, voltageOut, 0.95, 0.0);
-        double motorOut = velocityBangBang.getBangBang();
+        //velocityBangBang.setParameters(flywheelVelocity.getVelocity(), TARGET_VELOCITY, voltageOut - 0.06, 0.95, 0.0);
+        //double motorOut = velocityBangBang.getBangBang();
 
         motorOut = Range.clip(motorOut, 0.0, 1.0);
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);
 
-        sleep(30);
+        sleep(10);
     }
 
     public final void stopShooting()

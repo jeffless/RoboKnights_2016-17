@@ -168,7 +168,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     //protected static final double VELOCITY_P = 7.2;
     //protected static final double VELOCITY_I = 0.014;
-    protected static final double VELOCITY_P = 0.52;
+    protected static final double VELOCITY_P = 0.59;
     protected static final double VELOCITY_I = 0.1;
     protected static final double VELOCITY_D = 0.0;
 

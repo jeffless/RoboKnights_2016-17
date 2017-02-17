@@ -59,9 +59,10 @@ public class Autonomous_5220 extends OpMode_5220
     public static final int END_FAR_CAP_BALL = 4;
     public static final int END_FAR_BLOCK_BALL = 5;
     public static final int END_FAR_BLOCK_BEACON = 6;
-    public static final int END_AIM_CAP_BALL = 7;
-    public static final int END_AIM_RAMP = 8;
-    public static final int NUM_ENDS = 9;
+    public static final int END_FAR_STOP = 7;
+    public static final int END_AIM_CAP_BALL = 8;
+    public static final int END_AIM_RAMP = 9;
+    public static final int NUM_ENDS = 10;
 
     private double overLineTime = 950;
 
@@ -303,6 +304,7 @@ public class Autonomous_5220 extends OpMode_5220
                 case END_FAR_CAP_BALL: return "FAR: CAP BALL";
                 case END_FAR_BLOCK_BALL: return "FAR: BLOCK CAP BALL";
                 case END_FAR_BLOCK_BEACON: return "FAR: BLOCK BEACON";
+                case END_FAR_STOP: return "FAR: STOP";
                 case END_AIM_CAP_BALL: return "AIM: CAP BALL";
                 case END_AIM_RAMP: return "AIM: RAMP";
                 default: return "Error: End Path Number.";
@@ -990,6 +992,11 @@ public class Autonomous_5220 extends OpMode_5220
                     sleep(3000);
                     move(-15);
                 }
+            }
+
+            else if (endPath == END_FAR_STOP)
+            {
+                stopDrivetrain();
             }
 
         }

@@ -469,8 +469,8 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 setSweeperPower(1);
                 sleep(1800);
-                strafe(-3);
-                rotateEncoder(31.8);
+                strafe(-4);
+                rotateEncoder(37.8);
                 setSweeperPower(0);
             }
 
@@ -528,7 +528,7 @@ public class Autonomous_5220 extends OpMode_5220
             if(color == BLUE)
             {
                 move(-4, 0.4);
-                rotateEncoder(-10.1);
+                rotateEncoder(-8.1);
                 move(-22.5, 0.6);
             }
 
@@ -544,7 +544,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-23.0, 0.6);
+                move(-21.9, 0.6);
             }
 
             else if(color == RED)
@@ -560,7 +560,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                move (-9.5, 0.5);
+                move (-11.6, 0.5);
                 rotateEncoder(-32, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
@@ -570,7 +570,6 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 move(15, 0.5);
                 rotateEncoder(18, 0.7);
-                move(-3);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
@@ -788,14 +787,14 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == BLUE)
         {
             strafe(-7);
-            rotateEncoder(-10.1);
+            rotateEncoder(-6.3);
             move(-50);
         }
 
         else if (color == RED)
         {
             strafe (-7);
-            rotateEncoder(4.1);
+            rotateEncoder(5.3);
             move(50);
         }
 
@@ -820,8 +819,9 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            strafe(-62);
+            strafe(-36);
             move(15);
+
         }
 
         else if(color == RED)
@@ -834,6 +834,7 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
+    //TODO
     private void farBeaconToBallWithShooting()
     {
         if(color == BLUE)
@@ -851,11 +852,12 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void farStartToShootingPosition () //UNFINISHED
+    private void farStartToShootingPosition ()
     {
         if(color == BLUE)
         {
-
+            move(-11, 0.6);
+            rotateEncoder(-26.3, 0.6);
         }
 
         else if (color == RED)
@@ -865,6 +867,89 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
+    private void farShootingToRamp()
+    {
+        if (color == RED)
+        {
+            rotateEncoder(-7);
+            moveTime (2000, 0.9);
+        }
+
+        else if (color == BLUE)
+        {
+            rotateEncoder(9.8);
+            moveTime(2000, 0.9);
+        }
+    }
+
+    private void farShootingToCapBall()
+    {
+        if (color == RED)
+        {
+            rotateEncoder(-19.8   );
+            move(34);
+        }
+
+        else if (color == BLUE)
+        {
+            //TODO
+        }
+    }
+
+    //TODO
+    private void farShootingToBlockBall()
+    {
+        if (color == RED)
+        {
+            rotateEncoder(-13);
+            move(34);
+            rotateEncoder(-16);
+            while(gameTimer.time() < 10750 && runConditions());
+            move(28);
+        }
+
+        else if (color == BLUE)
+        {
+            while(gameTimer.time() < 10750);
+            move(-20);
+            strafe(12);
+        }
+    }
+
+    private void farShootingToBlockBeacon()
+    {
+        if (color == RED)
+        {
+            rotateEncoder(-13);
+            move(34);
+            rotateEncoder(-16);
+
+            while(gameTimer.time() < 10750 && runConditions());
+
+            move(35);
+            strafe(13);
+            move(20);
+            sleep(3500);
+            move(-20);
+        }
+
+        else if (color == BLUE)
+        {
+            rotateEncoder(13);
+            move(-34);
+            rotateEncoder(-31);
+
+            while(gameTimer.time() < 10750 && runConditions());
+
+            strafe(6);
+            move(35);
+            move(20);
+            sleep(3500);
+            move(-20);
+        }
+    }
+
+    //TODO
     private void closeBeaconToShootingPosition() //UNFINISHED
     {
         if(color == BLUE)
@@ -878,7 +963,8 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void shootingPositionToRamp() //UNTESTED
+    //TODO
+    private void shootingPositionToRamp()
     {
         if(color == BLUE)
         {
@@ -891,7 +977,8 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void shootingPositiongToCapBall() //UNTESTEd
+    //TODO
+    private void shootingPositiongToCapBall()
     {
         if(color == BLUE)
         {
@@ -906,7 +993,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     public void autonomous ()
     {
-        if(startPosition == START_FAR) //EVERYTHING HERE IS UNTESTED
+        if(startPosition == START_FAR)
         {
             farStartToShootingPosition();
             sleep(800);
@@ -914,84 +1001,22 @@ public class Autonomous_5220 extends OpMode_5220
 
             if (endPath == END_FAR_RAMP)
             {
-                if (color == RED)
-                {
-                    rotateEncoder(-16);
-                    moveTime (2000, 0.9);
-                }
-
-                else if (color == BLUE)
-                {
-
-                }
-
+                farShootingToRamp();
             }
 
             else if (endPath == END_FAR_CAP_BALL)
             {
-                if (color == RED)
-                {
-                    rotateEncoder(-15);
-                    move (32);
-                }
-
-                else if (color == BLUE)
-                {
-
-                }
-
+                farShootingToCapBall();
             }
 
             else if (endPath == END_FAR_BLOCK_BALL)
             {
-                if (color == RED)
-                {
-                    while (gameTimer.time() < 10750);
-                    move (-20);
-                    strafe (12);
-                }
-
-                else if (color == BLUE)
-                {
-                    while(gameTimer.time() < 10750);
-                    move(-20);
-                    strafe(12);
-                }
-
+                farShootingToBlockBall();
             }
 
             else if (endPath == END_FAR_BLOCK_BEACON) //if this works, it'll be OP when both our partner and at least one of our opponents has a full autonomous like ours, which takes more than ~12 seconds to reach the far beacon
             {
-                if (color == RED)
-                {
-                    rotateEncoder(-13);
-                    move(34);
-                    rotateEncoder(-16);
-
-                    while(gameTimer.time() < 10750 && runConditions());
-                    move(35);
-
-                    strafe(13);
-
-                    move(20);
-
-                    sleep(3500);
-
-                    move(-20);
-                }
-
-                else if (color == BLUE)
-                {
-                    rotateEncoder(-15);
-                    move (16);
-                    while (gameTimer.time() < 10750 && runConditions());
-                    rotateEncoder(10);
-                    strafeTime(-7, 1.0);
-                    rotateEncoder(-15);
-                    move(10);
-                    sleep(3000);
-                    move(-15);
-                }
+                farShootingToBlockBeacon();
             }
 
             else if (endPath == END_FAR_STOP)

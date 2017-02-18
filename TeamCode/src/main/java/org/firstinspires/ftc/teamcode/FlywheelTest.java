@@ -38,6 +38,8 @@ Add ultrasonic sensor when we add rescue beacon detection?
 
 
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.util.Range;
@@ -69,13 +71,19 @@ public class FlywheelTest extends LinearOpMode
 
         while(opModeIsActive())
         {
+            double currentVoltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
             flywheelRight.setPower(0.82);
             flywheelLeft.setPower(0.82);
             flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
             double currentVelocity = flywheelVelocity.getVelocity();
 
             telemetry.addData("Velocity: ", currentVelocity);
-            sleep(30);
+            Log.wtf("FLYWHEELVELOCITY", String.valueOf(currentVelocity) + "," + String.valueOf(currentVoltage));
+            sleep(10000);
+
+            flywheelLeft.setPower(0.0);
+            flywheelRight.setPower(0.0);
+            sleep(5000);
         }
 
         /*

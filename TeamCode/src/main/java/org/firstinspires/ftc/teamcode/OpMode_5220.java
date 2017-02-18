@@ -146,7 +146,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double LINE_WHITE_THRESHOLD = 28;
 
     protected static final double DOOR_OPEN = 0.5;
-    protected static final double DOOR_INIT = 0.8;
+    protected static final double DOOR_INIT = 1.0;
     protected static final double DOOR_CLOSED = 1.0;
 
     protected static final double RP_IN = 0.0;
@@ -166,9 +166,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 
-    //protected static final double VELOCITY_P = 7.2;
-    //protected static final double VELOCITY_I = 0.014;
-    protected static final double VELOCITY_P = 0.59;
+    //protected static final double VELOCITY_P = 0.59;
+    protected static final double VELOCITY_P = 7.2;
     protected static final double VELOCITY_I = 0.1;
     protected static final double VELOCITY_D = 0.0;
 

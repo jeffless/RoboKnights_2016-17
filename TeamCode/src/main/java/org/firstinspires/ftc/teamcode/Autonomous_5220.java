@@ -478,8 +478,8 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 setSweeperPower(1);
                 sleep(1800);
-                strafe(3);
-                rotateEncoder(-8.2);
+                strafe(2);
+                rotateEncoder(-7.1);
                 setSweeperPower(0);
             }
         }
@@ -534,9 +534,9 @@ public class Autonomous_5220 extends OpMode_5220
 
             else if(color == RED)
             {
-                move(4, 0.4);
-                rotateEncoder(5.2);
-                move(17.3, 0.6);
+                move(1.4, 0.4);
+                rotateEncoder(5.4);
+                move(18.7, 0.82);
             }
         }
 
@@ -549,7 +549,7 @@ public class Autonomous_5220 extends OpMode_5220
 
             else if(color == RED)
             {
-                move(16, 0.6);
+                move(16, 0.86);
             }
         }
     }
@@ -560,6 +560,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
+                //rotateEncoder(2, 0.7);
                 move (-11.6, 0.5);
                 rotateEncoder(-32, 0.7);
                 strafeTime(1000, 0.7);
@@ -568,8 +569,8 @@ public class Autonomous_5220 extends OpMode_5220
 
             else if (color == RED)
             {
-                move(15, 0.5);
-                rotateEncoder(18, 0.7);
+                move(12.7, 0.86);
+                rotateEncoder(20, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
@@ -579,16 +580,17 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                move (-9.5, 0.5);
-                rotateEncoder(-32.0, 0.7);
+                move (-10.3, 0.5);
+                rotateEncoder(-32.9, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
 
             else if (color == RED)
             {
-                move(15, 0.5);
-                rotateEncoder(18, 0.7);
+                //rotateEncoder(-1, 0.6);
+                move(13.7, 0.8);
+                rotateEncoder(21, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
@@ -786,7 +788,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         if (color == BLUE)
         {
-            strafe(-7);
+            strafe(-5);
             rotateEncoder(-6.3);
             move(-50);
         }
@@ -856,14 +858,18 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-11, 0.6);
-            rotateEncoder(-26.3, 0.6);
+            move(-13.1, 0.6);
+            sleep(750);
+            rotateEncoder(-27.1, 0.6);
         }
 
         else if (color == RED)
         {
+            /*move(11, 0.6);
+            rotateEncoder(20.5, 0.6); */
             move(11, 0.6);
-            rotateEncoder(17.2, 0.6);
+            sleep(750);
+            rotateEncoder(19.1, 0.6);
         }
     }
 
@@ -872,13 +878,15 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == RED)
         {
             rotateEncoder(-7);
-            moveTime (2000, 0.9);
+            move (40);
+            rotateEncoder(9.7);
+            moveTime (1000, 0.9);
         }
 
         else if (color == BLUE)
         {
-            rotateEncoder(9.8);
-            moveTime(2000, 0.9);
+            rotateEncoder(3.2);
+            moveTime(2100, -0.7);
         }
     }
 
@@ -886,7 +894,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
-            rotateEncoder(-19.8   );
+            rotateEncoder(-19.8);
             move(34);
         }
 
@@ -921,16 +929,26 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == RED)
         {
             rotateEncoder(-13);
-            move(34);
-            rotateEncoder(-16);
+            move(39);
+            rotateEncoder(-10.8);
 
             while(gameTimer.time() < 10750 && runConditions());
 
-            move(35);
-            strafe(13);
+            /*
+            move(36.5);
+            strafe(11.7);
             move(20);
             sleep(3500);
             move(-20);
+            */
+
+            move(35.2);
+            rotateEncoder(17.5);
+            move(-9.8);
+            strafe(11.7);
+            sleep(3000);
+            strafe(-17);
+
         }
 
         else if (color == BLUE)

@@ -151,6 +151,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double RP_IN = 0.0;
     protected static final double RP_RELEASE = 0.04;
+    protected static final double RP_RETRACTED = 0.03;
     protected static final double RP_OUT = 0.12;
 
     protected static final double HOOK_IN = 0.6;

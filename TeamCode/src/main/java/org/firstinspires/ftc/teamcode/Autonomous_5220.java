@@ -676,7 +676,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         moveRackAndPinion(RP_OUT);
         sleep(1500);
-        moveRackAndPinion(RP_RELEASE);
+        moveRackAndPinion(RP_RETRACTED);
         sleep(600);
     }
 
@@ -713,8 +713,7 @@ public class Autonomous_5220 extends OpMode_5220
         }
 
         pushButton();
-        sleep(200);
-
+        sleep(720);
         if(startPosition == START_NORMAL || startPosition == START_FAR) move ((color == BLUE ? 20: -23), 0.9);
         else if(startPosition == START_AIM) move((color == BLUE ? -20: 23), 0.9);
 
@@ -870,6 +869,7 @@ public class Autonomous_5220 extends OpMode_5220
             move(11, 0.6);
             sleep(750);
             rotateEncoder(19.1, 0.6);
+            strafe (-2);//NEW
         }
     }
 
@@ -895,12 +895,13 @@ public class Autonomous_5220 extends OpMode_5220
         if (color == RED)
         {
             rotateEncoder(-19.8);
-            move(34);
+            move(37);
         }
 
         else if (color == BLUE)
         {
-            //TODO
+            rotateEncoder(-19.8);
+            move(37);
         }
     }
 

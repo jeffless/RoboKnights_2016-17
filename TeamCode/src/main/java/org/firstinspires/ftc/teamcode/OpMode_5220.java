@@ -162,6 +162,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double TARGET_VOLTAGE = 12.5;
     protected static final double TARGET_VELOCITY = 1.1e-6;
+    //protected static final double TARGET_VELOCITY = 2.567e-6; //for 7 encoder
 
     protected static final double VOLTAGE_P = 0.18;
     protected static final double VOLTAGE_I = 0.0;
@@ -1549,7 +1550,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         //double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
 
         double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
-        Log.wtf("mai error", String.valueOf(velocityError));
+        Log.wtf("mai_error", String.valueOf(velocityError));
 
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
         double motorOut = velocityPID.getPID();
@@ -1561,7 +1562,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);
 
-        sleep(10);
+        sleep(30);
     }
 
     public final void stopShooting()
@@ -1644,10 +1645,14 @@ public abstract class OpMode_5220 extends LinearOpMode
     public class VoltageThread implements Runnable
     {
         private Thread thrd;
+        private boolean stopped;
+        Stopwatch voltageTimer;
 
         VoltageThread()
         {
             thrd = new Thread(this);
+            stopped = false;
+            voltageTimer = null;
             thrd.start();
         }
 
@@ -1656,7 +1661,18 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             while(runConditions())
             {
-                if(driveStopped() && shooterStopped() && sweeperStopped() && liftStopped()) voltage = batteryVoltage();
+                if(driveStopped() && shooterStopped() && sweeperStopped() && liftStopped() &&  !stopped)
+                {
+                    stopped = true;
+                    voltageTimer = new Stopwatch();
+                }
+
+                if(stopped && voltageTimer.time() > 2000)
+                {
+                    voltage = batteryVoltage();
+                    stopped = false;
+                    voltageTimer = null;
+                }
             }
         }
 

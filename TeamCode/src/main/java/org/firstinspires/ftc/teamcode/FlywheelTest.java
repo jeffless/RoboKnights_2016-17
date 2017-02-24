@@ -54,6 +54,8 @@ public class FlywheelTest extends LinearOpMode
     private static final double TOLERANCE = 0.5e-7;
     private static final double TARGET_VELOCITY = 1.1e-6;
 
+    private static double voltage = 0.0;
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -64,12 +66,31 @@ public class FlywheelTest extends LinearOpMode
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         PIDCalculator velocityPID = new PIDCalculator();
+        PIDCalculator voltagePID = new PIDCalculator();
         VelocityCalculator flywheelVelocity = new VelocityCalculator();
         BangBangCalculator velocityBangBang = new BangBangCalculator();
 
         waitForStart();
+        voltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
 
         while(opModeIsActive())
+        {
+            double voltageError = 12.5 - voltage;
+            voltagePID.setParameters(0.18, 0.0, 0.0, voltageError, 0.82);
+            double voltageOut = voltagePID.getPID();
+
+            flywheelLeft.setPower(voltageOut);
+            flywheelRight.setPower(voltageOut);
+
+            flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
+            double currentVelocity = flywheelVelocity.getVelocity();
+
+            telemetry.addData("Velocity: ", currentVelocity);
+            Log.wtf("FLYWHEELVELOCITY", String.valueOf(currentVelocity));
+            sleep(30);
+        }
+
+        /*while(opModeIsActive())
         {
             double currentVoltage = this.hardwareMap.voltageSensor.iterator().next().getVoltage();
             flywheelRight.setPower(0.82);
@@ -84,7 +105,7 @@ public class FlywheelTest extends LinearOpMode
             flywheelLeft.setPower(0.0);
             flywheelRight.setPower(0.0);
             sleep(5000);
-        }
+        } */
 
         /*
         PID Example

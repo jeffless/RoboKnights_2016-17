@@ -161,8 +161,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double CLAMP_DOWN = 0.93;
 
     protected static final double TARGET_VOLTAGE = 12.5;
-    protected static final double TARGET_VELOCITY = 1.1e-6;
-    //protected static final double TARGET_VELOCITY = 2.567e-6; //for 7 encoder
+    //protected static final double TARGET_VELOCITY = 1.1e-6;
+    protected static final double TARGET_VELOCITY = 2.567e-6; //for 7 encoder
 
     protected static final double VOLTAGE_P = 0.18;
     protected static final double VOLTAGE_I = 0.0;
@@ -170,7 +170,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     //protected static final double VELOCITY_P = 0.59;
     protected static final double VELOCITY_P = 7.2;
-    protected static final double VELOCITY_I = 0.1;
+    protected static final double VELOCITY_I = 0.0;
     protected static final double VELOCITY_D = 0.0;
 
     protected static final double ST_1 = 0.0;
@@ -1547,7 +1547,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         double voltageOut = voltagePID.getPID();
 
         flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
-        //double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity()) * Math.pow(10, 4);
 
         double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
         Log.wtf("mai_error", String.valueOf(velocityError));
@@ -1645,14 +1644,10 @@ public abstract class OpMode_5220 extends LinearOpMode
     public class VoltageThread implements Runnable
     {
         private Thread thrd;
-        private boolean stopped;
-        Stopwatch voltageTimer;
 
         VoltageThread()
         {
             thrd = new Thread(this);
-            stopped = false;
-            voltageTimer = null;
             thrd.start();
         }
 
@@ -1661,18 +1656,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             while(runConditions())
             {
-                if(driveStopped() && shooterStopped() && sweeperStopped() && liftStopped() &&  !stopped)
-                {
-                    stopped = true;
-                    voltageTimer = new Stopwatch();
-                }
-
-                if(stopped && voltageTimer.time() > 2000)
-                {
-                    voltage = batteryVoltage();
-                    stopped = false;
-                    voltageTimer = null;
-                }
+                if(driveStopped() && shooterStopped() && sweeperStopped() && liftStopped()) voltage = batteryVoltage();
             }
         }
 
@@ -1700,6 +1684,7 @@ public abstract class OpMode_5220 extends LinearOpMode
             return(liftMotor.getPower() == 0);
         }
     }
+
 
     public double getFloorBrightness ()
     {

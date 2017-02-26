@@ -1542,13 +1542,17 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void shoot()
     {
+        /*First layer of PID that acts upon the battery level*/
+
         double voltageError = TARGET_VOLTAGE - voltage;
         voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.82);
         double voltageOut = voltagePID.getPID();
 
-        flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
+        /*Second layer of PID that acts upon the flywheel speed*/
 
+        flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
         double velocityError = (TARGET_VELOCITY - flywheelVelocity.getVelocity());
+        //velocityError = velocityError * Math.pow(10, 6);
         Log.wtf("mai_error", String.valueOf(velocityError));
 
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
@@ -1561,7 +1565,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);
 
-        sleep(30);
+        //sleep(30);
+        sleep(80);
     }
 
     public final void stopShooting()

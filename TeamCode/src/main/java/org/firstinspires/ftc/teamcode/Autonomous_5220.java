@@ -1118,7 +1118,7 @@ public class Autonomous_5220 extends OpMode_5220
         waitFullCycle();
 
         shoot = new ShootThread();
-        voltage = new VoltageThread();
+        //voltage = new VoltageThread();
 
         while (gameTimer.time() < (startWaitTime * 1000))
         {

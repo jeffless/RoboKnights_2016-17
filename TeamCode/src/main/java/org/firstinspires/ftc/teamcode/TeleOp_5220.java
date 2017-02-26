@@ -415,7 +415,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         shoot.start();*/
 
         shoot = new ShootThread();
-        voltage = new VoltageThread();
+        //voltage = new VoltageThread();
 
         while (runConditions())
         {

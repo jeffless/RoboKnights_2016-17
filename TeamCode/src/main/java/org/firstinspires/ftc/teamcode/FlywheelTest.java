@@ -50,9 +50,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 //@Disabled
 public class FlywheelTest extends LinearOpMode
 {
-    private DcMotor flywheelLeft;
+    //private DcMotor flywheelLeft;
     private DcMotor flywheelRight;
-    private Servo doorServo;
+    //private Servo doorServo;
 
     private static final double TOLERANCE = 0.5e-7;
     private static final double TARGET_VELOCITY = 2.567e-6;
@@ -66,14 +66,14 @@ public class FlywheelTest extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        flywheelLeft = hardwareMap.dcMotor.get("flywheel1");
-        flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //flywheelLeft = hardwareMap.dcMotor.get("flywheel1");
+        //flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flywheelRight = hardwareMap.dcMotor.get("flywheel2");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        doorServo = hardwareMap.servo.get("dServo");
-        doorServo.setPosition(0.5);
+        //doorServo = hardwareMap.servo.get("dServo");
+        //doorServo.setPosition(0.5);
 
         PIDCalculator velocityPID = new PIDCalculator();
         PIDCalculator voltagePID = new PIDCalculator();
@@ -87,27 +87,29 @@ public class FlywheelTest extends LinearOpMode
 
         while(opModeIsActive())
         {
-            leftVelocity.setParameters(System.nanoTime(), flywheelLeft.getCurrentPosition());
+            //leftVelocity.setParameters(System.nanoTime(), flywheelLeft.getCurrentPosition());
             rightVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
 
-            double leftVelocityResult = leftVelocity.getVelocity();
+            //double leftVelocityResult = leftVelocity.getVelocity();
             double rightVelocityResult = rightVelocity.getVelocity();
 
             double voltageError = 12.5 - voltage;
-            voltagePID.setParameters(0.18, 0.0, 0.0, voltageError, 0.82);
+            voltagePID.setParameters(0.18, 0.0, 0.0, voltageError, 0.65);
             double voltageOut = voltagePID.getPID();
 
-            double velocityError = (TARGET_VELOCITY - leftVelocity.getVelocity());
+            /*double velocityError = (TARGET_VELOCITY - leftVelocity.getVelocity());
             velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError , voltageOut);
             double motorOut = velocityPID.getPID();
-            motorOut = Range.clip(motorOut, 0, 1);
+            motorOut = Range.clip(motorOut, 0, 1); */
 
-            flywheelLeft.setPower(motorOut);
-            flywheelRight.setPower(motorOut);
+            double velocityError = (TARGET_VELOCITY - rightVelocityResult);
+            Log.wtf("mai_error", String.valueOf(velocityError));
 
-            telemetry.addData("Left Velocity: ", leftVelocityResult);
+            //flywheelLeft.setPower(voltageOut);
+            flywheelRight.setPower(voltageOut);
+
+            //telemetry.addData("Left Velocity: ", leftVelocityResult);
             telemetry.addData("Right Velocity: ", rightVelocityResult);
-            telemetry.addData("Velocity Error: ", velocityError);
             telemetry.update();
             sleep(80);
         }
@@ -118,7 +120,8 @@ public class FlywheelTest extends LinearOpMode
             flywheelRight.setPower(0.82);
             flywheelLeft.setPower(0.82);
             flywheelVelocity.setParameters(System.nanoTime(), flywheelRight.getCurrentPosition());
-            double currentVelocity = flywheelVelocity.getVelocity();
+            do/
+            uble currentVelocity = flywheelVelocity.getVelocity();
 
             telemetry.addData("Velocity: ", currentVelocity);
             Log.wtf("FLYWHEELVELOCITY", String.valueOf(currentVelocity) + "," + String.valueOf(currentVoltage));

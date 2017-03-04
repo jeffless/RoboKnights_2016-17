@@ -354,12 +354,22 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 if ((gamepad1.dpad_right && !prevGamepad1.dpad_right))
                 {
-                    moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
+                    if(hookServo.getPosition() == HOOK_IN)
+                    {
+                        moveLiftClamp(CLAMP_RELEASE);
+                        moveHook(HOOK_RELEASE);
+                    }
+
+                    else if(hookServo.getPosition() == HOOK_RELEASE)
+                    {
+                        moveLiftClamp(CLAMP_IN);
+                        moveHook(HOOK_IN);
+                    }
                 }
 
                 if ((gamepad1.dpad_left && !prevGamepad1.dpad_left))
                 {
-                    moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
+
                 }
             }
 
@@ -371,12 +381,22 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 if ((gamepad2.dpad_right && !prevGamepad2.dpad_right))
                 {
-                    moveHook(hookServo.getPosition() != HOOK_IN ? HOOK_IN : HOOK_RELEASE);
+                    if(hookServo.getPosition() == HOOK_IN)
+                    {
+                        moveLiftClamp(CLAMP_RELEASE);
+                        moveHook(HOOK_RELEASE);
+                    }
+
+                    else if(hookServo.getPosition() == HOOK_RELEASE)
+                    {
+                        moveLiftClamp(CLAMP_IN);
+                        moveHook(HOOK_IN);
+                    }
                 }
 
                 if ((gamepad2.dpad_left && !prevGamepad2.dpad_left))
                 {
-                    moveBallClamp(clampServo.getPosition() != CLAMP_IN ? CLAMP_IN : CLAMP_DOWN);
+
                 }
             }
 

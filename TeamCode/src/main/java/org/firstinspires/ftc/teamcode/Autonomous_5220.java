@@ -55,20 +55,21 @@ public class Autonomous_5220 extends OpMode_5220
     public static final int END_NORMAL_CAP_BALL = 0;
     public static final int END_NORMAL_BLOCK = 1;
     public static final int END_NORMAL_SHOOT = 2;
-    public static final int END_FAR_RAMP = 3;
-    public static final int END_FAR_CAP_BALL = 4;
-    public static final int END_FAR_BLOCK_BALL = 5;
-    public static final int END_FAR_BLOCK_BEACON = 6;
-    public static final int END_FAR_STOP = 7;
-    public static final int END_AIM_CAP_BALL = 8;
-    public static final int END_AIM_RAMP = 9;
-    public static final int NUM_ENDS = 10;
+    public static final int END_NORMAL_RAMP = 3;
+    public static final int END_FAR_RAMP = 4;
+    public static final int END_FAR_CAP_BALL = 5;
+    public static final int END_FAR_BLOCK_BALL = 6;
+    public static final int END_FAR_BLOCK_BEACON = 7;
+    public static final int END_FAR_STOP = 8;
+    public static final int END_AIM_CAP_BALL = 9;
+    public static final int END_AIM_RAMP = 10;
+    public static final int NUM_ENDS = 111;
 
     private double overLineTime = 950;
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = RED; //arbitrary default
+    private boolean color = BLUE; //arbitrary default
     private int startPosition = START_NORMAL;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
@@ -300,6 +301,7 @@ public class Autonomous_5220 extends OpMode_5220
                 case END_NORMAL_CAP_BALL: return "NORMAL: CAP BALL";
                 case END_NORMAL_BLOCK: return "NORMAL: BEACON DEFENSE";
                 case END_NORMAL_SHOOT: return "NORMAL: SHOOTING";
+                case END_NORMAL_RAMP: return "NORMAL: RAMP";
                 case END_FAR_RAMP: return "FAR: RAMP";
                 case END_FAR_CAP_BALL: return "FAR: CAP BALL";
                 case END_FAR_BLOCK_BALL: return "FAR: BLOCK CAP BALL";
@@ -527,16 +529,20 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-4, 0.4);
+                move(-4, 0.7, ENCODER);
+                sleep(200);
                 rotateEncoder(-8.1);
-                move(-22.5, 0.6);
+                sleep(200);
+                move(-22.5, 0.7, ENCODER);
             }
 
             else if(color == RED)
             {
-                move(1.4, 0.4);
+                move(1.4, 0.7, ENCODER);
+                sleep(200);
                 rotateEncoder(5.4);
-                move(18.7, 0.82);
+                sleep(200);
+                move(18.7, 0.7, ENCODER);
             }
         }
 
@@ -544,7 +550,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-21.9, 0.6);
+                move(-21.9, 0.82);
             }
 
             else if(color == RED)
@@ -580,7 +586,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                move (-10.3, 0.5);
+                move (-11.3, 0.8);
                 rotateEncoder(-32.9, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
@@ -690,7 +696,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(0.8, 0.8);
+                move(1.0, 0.8);
             }
 
             if(color == RED)
@@ -723,7 +729,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(0.5, 0.8);
+                move(1.0, 0.8);
             }
 
             if(color == RED)
@@ -802,6 +808,23 @@ public class Autonomous_5220 extends OpMode_5220
         setSweeperPower(0.0);
     }
 
+    public void farBeaconToRamp()
+    {
+        if (color == BLUE)
+        {
+            move(-37);
+            strafe(-5);
+            moveTime (2800, -0.5);
+        }
+
+        else if (color == RED)
+        {
+            move(37);
+            strafe(-5);
+            moveTime (2800, 0.5);
+        }
+    }
+
     private void ballToShooting()
     {
         if(color == BLUE)
@@ -857,7 +880,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-13.1, 0.6);
+            move(-13.1, 0.82, ENCODER);
             sleep(750);
             rotateEncoder(-27.1, 0.6);
         }
@@ -866,10 +889,9 @@ public class Autonomous_5220 extends OpMode_5220
         {
             /*move(11, 0.6);
             rotateEncoder(20.5, 0.6); */
-            move(11, 0.6);
+            move(9, 0.6, ENCODER);
             sleep(750);
-            rotateEncoder(19.1, 0.6);
-            strafe (-2);//NEW
+            rotateEncoder(19.6, 0.6);
         }
     }
 
@@ -1068,10 +1090,17 @@ public class Autonomous_5220 extends OpMode_5220
                 alignWithFarLine();
                 farBeaconToBallWithShooting();
             }
+
             else if (endPath == END_NORMAL_CAP_BALL)
             {
                 alignWithFarLine();
                 farBeaconToBall();
+            }
+
+            else if (endPath == END_NORMAL_RAMP)
+            {
+                //alignWithFarLine();
+                farBeaconToRamp();
             }
         }
 

@@ -152,17 +152,17 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double RP_IN = 0.0;
     protected static final double RP_RELEASE = 0.04;
     protected static final double RP_RETRACTED = 0.03;
-    protected static final double RP_OUT = 0.12;
+    protected static final double RP_OUT = 0.14;
 
     protected static final double HOOK_IN = 0.6;
     protected static final double HOOK_RELEASE = 0.96;
 
-    protected static final double CLAMP_IN = 1.0;
-    protected static final double CLAMP_DOWN = 0.93;
+    protected static final double CLAMP_IN = 0.3;
+    protected static final double CLAMP_RELEASE = 0.8;
 
     protected static final double TARGET_VOLTAGE = 12.5;
     //protected static final double TARGET_VELOCITY = 1.1e-6;
-    protected static final double TARGET_VELOCITY = 2.567e-6; //for 7 encoder
+    protected static final double TARGET_VELOCITY = 2.7e-6; //for 7 encoder
 
     protected static final double VOLTAGE_P = 0.18;
     protected static final double VOLTAGE_I = 0.0;
@@ -170,7 +170,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     //protected static final double VELOCITY_P = 0.59;
     protected static final double VELOCITY_P = 7.2;
-    protected static final double VELOCITY_I = 0.0;
+    protected static final double VELOCITY_I = 0.05;
     protected static final double VELOCITY_D = 0.0;
 
     protected static final double ST_1 = 0.0;
@@ -299,7 +299,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         moveRackAndPinion(RP_IN);
         moveHook(HOOK_IN);
         moveDoor(DOOR_INIT);
-        moveBallClamp(CLAMP_IN);
+        moveLiftClamp(CLAMP_IN);
 
         waitFullCycle();
 /*
@@ -1410,7 +1410,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         autoExtendServo.setPosition(position);
     }
 
-    public final void moveBallClamp(double position)
+    public final void moveLiftClamp(double position)
     {
         clampServo.setPosition(position);
     }
@@ -1545,7 +1545,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         /*First layer of PID that acts upon the battery level*/
 
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.82);
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.65);
         double voltageOut = voltagePID.getPID();
 
         /*Second layer of PID that acts upon the flywheel speed*/

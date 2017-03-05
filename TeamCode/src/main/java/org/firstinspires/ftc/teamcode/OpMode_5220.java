@@ -162,13 +162,15 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double TARGET_VOLTAGE = 12.5;
     //protected static final double TARGET_VELOCITY = 1.1e-6;
-    protected static final double TARGET_VELOCITY = 2.7e-6; //for 7 encoder
+    protected static final double TARGET_VELOCITY = 2.945e-6; //for 7 encoder
+
+    protected static final double TOLERANCE = 8.1e-7;
 
     protected static final double VOLTAGE_P = 0.18;
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 
-    //protected static final double VELOCITY_P = 0.59;
+    //protected static final double VELOCITY_P = 9000;
     protected static final double VELOCITY_P = 7.2;
     protected static final double VELOCITY_I = 0.05;
     protected static final double VELOCITY_D = 0.0;
@@ -1556,7 +1558,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         /*First layer of PID that acts upon the battery level*/
 
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.65);
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.74);
         double voltageOut = voltagePID.getPID();
 
         /*Second layer of PID that acts upon the flywheel speed*/
@@ -1569,7 +1571,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         velocityPID.setParameters(VELOCITY_P, VELOCITY_I, VELOCITY_D, velocityError, voltageOut);
         double motorOut = velocityPID.getPID();
 
-        //velocityBangBang.setParameters(flywheelVelocity.getVelocity(), TARGET_VELOCITY, voltageOut - 0.06, 0.95, 0.0);
+        //velocityBangBang.setParameters(flywheelVelocity.getVelocity(), TARGET_VELOCITY, voltageOut - 15, voltageOut, TOLERANCE);
         //double motorOut = velocityBangBang.getBangBang();
 
         motorOut = Range.clip(motorOut, 0.0, 1.0);
@@ -1703,10 +1705,24 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public class PixyThread implements Runnable
     {
+        private Thread thrd;
+
+        PixyThread()
+        {
+            thrd = new Thread(this);
+            thrd.start();
+        }
         @Override
         public void run()
         {
             pixyValues = PIXYREADER.read(PIXY_START, PIXY_LENGTH);
+        }
+
+        private void readPacket(int Signature)
+        {
+            int checksum;
+            int sig;
+            byte[] rawData = new byte[32];
         }
     }
 

@@ -176,6 +176,10 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
 
+    protected static byte[] pixyValues = new byte[6];
+    protected static final int PIXY_START = 0x50;
+    protected static final int PIXY_LENGTH = 6;
+
     //MOTORS AND SERVOS:
 
     protected static final String[] motorNames = {}; //Fill this in later.
@@ -209,6 +213,9 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected TouchSensor touchSensor1;
     protected TouchSensor touchSensor2;
     protected TouchSensor touchSensorFront;
+    protected I2cAddr PIXYADDRESS = new I2cAddr(0x54);
+    protected I2cDevice PIXY;
+    protected I2cDeviceSynch PIXYREADER;
 
     //OTHER GLOBAL VARIABLES:
 
@@ -292,6 +299,10 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorDown.enableLed(true);
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         touchSensorFront = hardwareMap.touchSensor.get("tSensor");
+
+        PIXY = hardwareMap.i2cDevice.get("pixy");
+        PIXYREADER = new I2cDeviceSynchImpl(PIXY, PIXYADDRESS, false);
+        PIXYREADER.engage();
     }
 
     public void initialize()
@@ -1687,6 +1698,15 @@ public abstract class OpMode_5220 extends LinearOpMode
         private boolean liftStopped()
         {
             return(liftMotor.getPower() == 0);
+        }
+    }
+
+    public class PixyThread implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            pixyValues = PIXYREADER.read(PIXY_START, PIXY_LENGTH);
         }
     }
 

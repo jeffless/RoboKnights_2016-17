@@ -67,7 +67,7 @@ public class FlywheelTest extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
         //flywheelLeft = hardwareMap.dcMotor.get("flywheel1");
-        //flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //f0.l2.ywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flywheelRight = hardwareMap.dcMotor.get("flywheel2");
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

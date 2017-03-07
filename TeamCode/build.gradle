@@ -16,6 +16,7 @@ apply from: '../build.common.gradle'
 
 repositories {
     flatDir {
-        dirs 'libs', 'C:\\navx-micro\\android\\libs'
+        //dirs 'libs', 'C:\\navx-micro\\android\\libs'
+        dirs 'libs', 'libs\\navx-micro\\android\\libs'
     }
 }

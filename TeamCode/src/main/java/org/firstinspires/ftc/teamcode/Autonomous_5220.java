@@ -333,7 +333,7 @@ public class Autonomous_5220 extends OpMode_5220
     private void shootAutonomousBalls()
     {
         shoot.mResume();
-        sleep(1200);
+        sleep(2100);
         moveDoor(DOOR_OPEN);
         sleep(2000);
         moveDoor(DOOR_CLOSED);
@@ -529,20 +529,20 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-4, 0.7, ENCODER);
+                move(-4, 0.65, ENCODER);
                 sleep(200);
-                rotateEncoder(-8.1);
+                rotateEncoder(-9.1);
                 sleep(200);
-                move(-22.5, 0.7, ENCODER);
+                move(-22.5, 0.65, ENCODER);
             }
 
             else if(color == RED)
             {
-                move(1.4, 0.7, ENCODER);
+                move(1.4, 0.65, ENCODER);
                 sleep(200);
                 rotateEncoder(5.4);
                 sleep(200);
-                move(18.7, 0.7, ENCODER);
+                move(18.7, 0.65, ENCODER);
             }
         }
 
@@ -550,12 +550,12 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-21.9, 0.82);
+                move(-21.9, 0.65);
             }
 
             else if(color == RED)
             {
-                move(16, 0.86);
+                move(16, 0.65);
             }
         }
     }
@@ -566,8 +566,8 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                //rotateEncoder(2, 0.7);
-                move (-11.6, 0.5);
+                rotateEncoder(2, 0.7);
+                move (-11.6, 0.86);
                 rotateEncoder(-32, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
@@ -880,7 +880,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-13.1, 0.82, ENCODER);
+            move(-14.3, 0.82, ENCODER);
             sleep(750);
             rotateEncoder(-27.1, 0.6);
         }

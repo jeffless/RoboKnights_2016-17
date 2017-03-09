@@ -269,7 +269,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 else if (teleOpShootingState == SHOOTER_ON) //THE ELSE HERE IS IMPORTANT
                 {
-                    if (shooterTimer.time() < 1200)
+                    if (shooterTimer.time() < 2100)
                     {
                         fireWhenReady = true;
                     }

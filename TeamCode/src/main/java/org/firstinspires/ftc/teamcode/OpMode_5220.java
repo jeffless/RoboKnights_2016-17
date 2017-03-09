@@ -166,7 +166,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double TOLERANCE = 8.1e-7;
 
-    protected static final double VOLTAGE_P = 0.18;
+    protected static final double VOLTAGE_P = 0.20;
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 
@@ -177,10 +177,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
-
-    protected static byte[] pixyValues = new byte[6];
-    protected static final int PIXY_START = 0x50;
-    protected static final int PIXY_LENGTH = 6;
 
     //MOTORS AND SERVOS:
 
@@ -215,9 +211,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected TouchSensor touchSensor1;
     protected TouchSensor touchSensor2;
     protected TouchSensor touchSensorFront;
-    protected I2cAddr PIXYADDRESS = new I2cAddr(0x54);
-    protected I2cDevice PIXY;
-    protected I2cDeviceSynch PIXYREADER;
+    protected AnalogInput currentSensor;
 
     //OTHER GLOBAL VARIABLES:
 
@@ -301,10 +295,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorDown.enableLed(true);
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         touchSensorFront = hardwareMap.touchSensor.get("tSensor");
-
-        PIXY = hardwareMap.i2cDevice.get("pixy");
-        PIXYREADER = new I2cDeviceSynchImpl(PIXY, PIXYADDRESS, false);
-        PIXYREADER.engage();
+        currentSensor = hardwareMap.analogInput.get("current");
     }
 
     public void initialize()
@@ -410,6 +401,8 @@ public abstract class OpMode_5220 extends LinearOpMode
             debugLoopOn = true;
             while (debugLoopOn && opModeIsActive())
             {
+                double input = currentSensor.getVoltage();
+                double current = ((input + 30) / 60) * 1023;
 
                 yaw = df.format(navX.getYaw());
                 pitch = df.format(navX.getPitch());
@@ -427,6 +420,7 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData ("7", "Y,P,R,FH: " + yprf);
 
                 telemetry.addData("9", "Voltage: " + voltage);
+                telemetry.addData("10,", "Current: " + current);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1558,7 +1552,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         /*First layer of PID that acts upon the battery level*/
 
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.60);
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.57);
         double voltageOut = voltagePID.getPID();
 
         /*Second layer of PID that acts upon the flywheel speed*/
@@ -1580,8 +1574,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         //sleep(30);
         sleep(80);
-
-
     }
 
     public final void stopShooting()
@@ -1702,29 +1694,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         private boolean liftStopped()
         {
             return(liftMotor.getPower() == 0);
-        }
-    }
-
-    public class PixyThread implements Runnable
-    {
-        private Thread thrd;
-
-        PixyThread()
-        {
-            thrd = new Thread(this);
-            thrd.start();
-        }
-        @Override
-        public void run()
-        {
-            pixyValues = PIXYREADER.read(PIXY_START, PIXY_LENGTH);
-        }
-
-        private void readPacket(int Signature)
-        {
-            int checksum;
-            int sig;
-            byte[] rawData = new byte[32];
         }
     }
 

@@ -121,7 +121,7 @@ public class Autonomous_5220 extends OpMode_5220
         public void run ()
         {
             for (int i = 0; i < telemetryLines.length; i++) telemetryLines[i] = "";
-            telemetryLines[COLOR] = ("*Color: " + (color == RED ? "RED" : "BLUE"));
+            telemetryLines[COLOR] = ("*Color: " + (color == RED ? "RED (Sweeper Against Wall)" : "BLUE (Lift Against Wall)"));
             telemetryLines[START] = ("Start Position: " + startPositionToString(startPosition));
             telemetryLines[THREE_BALLS] = ("Third Ball: " + (thirdBallOn ? "ON" : "OFF"));
             telemetryLines[WAIT] = ("Wait Time: " + startWaitTime + " seconds");
@@ -567,7 +567,7 @@ public class Autonomous_5220 extends OpMode_5220
             if (color == BLUE)
             {
                 rotateEncoder(2, 0.7);
-                move (-11.6, 0.86);
+                move (-10.8, 0.86);
                 rotateEncoder(-32, 0.7);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
@@ -880,16 +880,16 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-14.3, 0.82, ENCODER);
+            move(-17.1, 0.82, ENCODER);
             sleep(750);
-            rotateEncoder(-27.1, 0.6);
+            rotateEncoder(-26.9, 0.6);
         }
 
         else if (color == RED)
         {
             /*move(11, 0.6);
             rotateEncoder(20.5, 0.6); */
-            move(9, 0.6, ENCODER);
+            move(13.2, 0.82, ENCODER);
             sleep(750);
             rotateEncoder(19.6, 0.6);
         }
@@ -916,14 +916,14 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
-            rotateEncoder(-19.8);
+            rotateEncoder(-17.2);
             move(37);
         }
 
         else if (color == BLUE)
         {
-            rotateEncoder(-19.8);
-            move(37);
+            rotateEncoder(-17.2);
+            move(34);
         }
     }
 

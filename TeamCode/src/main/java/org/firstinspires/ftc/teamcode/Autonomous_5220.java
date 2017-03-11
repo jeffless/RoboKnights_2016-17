@@ -529,11 +529,11 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-4, 0.65, ENCODER);
+                move(-5, 0.64, ENCODER);
                 sleep(200);
                 rotateEncoder(-9.1);
                 sleep(200);
-                move(-22.5, 0.65, ENCODER);
+                move(-18.9, 0.64, ENCODER);
             }
 
             else if(color == RED)
@@ -587,8 +587,11 @@ public class Autonomous_5220 extends OpMode_5220
             if (color == BLUE)
             {
                 move (-11.3, 0.8);
-                rotateEncoder(-32.9, 0.7);
+                rotateEncoder(-28.4, 0.8);
+                move(2.5);
                 strafeTime(1000, 0.7);
+                diagonalStrafeAgainstWall(BACKWARDS);
+                sleep (450);
                 stopDrivetrain();
             }
 
@@ -814,14 +817,14 @@ public class Autonomous_5220 extends OpMode_5220
         {
             move(-37);
             strafe(-5);
-            moveTime (2800, -0.5);
+            moveTime (1500, -0.75);
         }
 
         else if (color == RED)
         {
             move(37);
             strafe(-5);
-            moveTime (2800, 0.5);
+            moveTime (1500, 0.75);
         }
     }
 

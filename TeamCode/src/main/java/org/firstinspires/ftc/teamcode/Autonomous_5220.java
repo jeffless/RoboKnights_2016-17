@@ -919,7 +919,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
-            rotateEncoder(-17.2);
+            rotateEncoder(-15.2);
             move(37);
         }
 

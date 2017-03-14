@@ -1552,7 +1552,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         /*First layer of PID that acts upon the battery level*/
 
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.57);
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.52); //0.57
         double voltageOut = voltagePID.getPID();
 
         /*Second layer of PID that acts upon the flywheel speed*/

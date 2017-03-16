@@ -223,7 +223,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 color = !color;
 
-                telemetryLines[COLOR] = ("Color: " + (color == RED ? "RED" : "BLUE"));
+                telemetryLines[COLOR] = ("Color: " + (color == RED ? "RED (Sweeper Against Wall)" : "BLUE (Lift Against Wall)"));
             }
 
             else if (setting == START)

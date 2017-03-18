@@ -138,6 +138,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double ROTATE_IMU_PROPORTIONALITY_CONSTANT = 32;
     protected static final double ROTATE_IMU_DIFFERENTIAL_CONSTANT = 0;
 
+    protected static final double SLOW_P = 0.3;
 
     protected static final double CLIMBER_FLING_TIME = 1.0;
     protected static final double HOOK_ADJUST_RELEASE_TIME = 2.0;
@@ -206,6 +207,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected AHRS navX;
     protected ColorSensor colorSensorFront;
+    protected ColorSensor colorSensorAlt;
     protected ColorSensor colorSensorDown;
     protected GyroSensor gyroSensor;
     protected TouchSensor touchSensor1;
@@ -289,9 +291,12 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
+        colorSensorAlt = hardwareMap.colorSensor.get("cSensorA");
         colorSensorDown.setI2cAddress(I2cAddr.create8bit(0x3E));//IF 7 BIT DOESN'T WORK TRY 8 BIT ADDRESS (I2cAddr.create8bit(0x3E)), OR USING I2CADDR CONSTRUCTOR
         // in hex, 0x3e = 62. deault address is 60 (reserved for colorSensorDown)
+        colorSensorAlt.setI2cAddress(I2cAddr.create8bit(0x34));
         colorSensorFront.enableLed(false);
+        colorSensorAlt.enableLed(false);
         colorSensorDown.enableLed(true);
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         touchSensorFront = hardwareMap.touchSensor.get("tSensor");
@@ -416,8 +421,9 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData("3", "LBM: " + leftBackMotor.getCurrentPosition() + ", RBM: " + rightBackMotor.getCurrentPosition());
 
                 telemetry.addData("5", "Down: R = " + colorSensorDown.red() + ", G = " + colorSensorDown.green() + ", B = " + colorSensorDown.blue() + ", A = " +  colorSensorDown.alpha());
-                telemetry.addData("6", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
-                telemetry.addData ("7", "Y,P,R,FH: " + yprf);
+                telemetry.addData("6", "Front: R = " + colorSensorAlt.red() + ", G = " + colorSensorAlt.green() + ", B = " + colorSensorAlt.blue() + ", A = " +  colorSensorAlt.alpha());
+                telemetry.addData("7", "Front: R = " + colorSensorFront.red() + ", G = " + colorSensorFront.green() + ", B = " + colorSensorFront.blue() + ", A = " +  colorSensorFront.alpha());
+                telemetry.addData ("8", "Y,P,R,FH: " + yprf);
 
                 telemetry.addData("9", "Voltage: " + voltage);
                 telemetry.addData("10,", "Current: " + current);

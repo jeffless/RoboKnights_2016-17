@@ -54,7 +54,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
     private static final boolean DPAD_LIFT = false;
     private static final boolean DPAD_DRIVE = true;
-    private boolean dPadMode = DPAD_DRIVE;
+    private boolean dPadMode = DPAD_LIFT;
 
     private ShootThread shoot;
     private VoltageThread voltage;
@@ -114,6 +114,12 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     direction = -direction;
                 }
 
+                if(slowDriveOn)
+                {
+                    throttle = SLOW_P * throttle;
+                    direction = SLOW_P * direction;
+                }
+
                 rightPower = throttle - direction;
                 leftPower = throttle + direction;
 
@@ -159,6 +165,12 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     /*if (reverse) {
                         direction = -direction;
                     }*/
+
+                    if(slowDriveOn)
+                    {
+                        throttle = SLOW_P * throttle;
+                        direction = SLOW_P * direction;
+                    }
 
                     backPower = throttle - direction; //SWITCH THESE AROUND IF THIS ENDS UP BEING THE WRONG WAY
                     frontPower = throttle + direction;
@@ -250,7 +262,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
             if (gamepad1.back && !prevGamepad1.back)
             {
-                dPadMode = !dPadMode;
+                //dPadMode = !dPadMode;
+                slowDriveOn = !slowDriveOn;
             }
 
             if(gamepad1.guide && !prevGamepad1.guide)

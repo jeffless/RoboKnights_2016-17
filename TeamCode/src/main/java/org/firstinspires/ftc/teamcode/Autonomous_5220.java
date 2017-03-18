@@ -721,7 +721,23 @@ public class Autonomous_5220 extends OpMode_5220
             }
         }
 
-        pushButton();
+        if (color == BLUE)
+        {
+            if (colorSensorAlt.blue() > colorSensorAlt.red())
+            {
+                pushButton();
+            }
+        }
+
+        else if (color == RED)
+        {
+            if (colorSensorAlt.red() > colorSensorAlt.blue())
+            {
+                pushButton();
+            }
+        }
+
+        //pushButton();
         sleep(720);
         if(startPosition == START_NORMAL || startPosition == START_FAR) move ((color == BLUE ? 20: -23), 0.9);
         else if(startPosition == START_AIM) move((color == BLUE ? -20: 23), 0.9);
@@ -755,7 +771,22 @@ public class Autonomous_5220 extends OpMode_5220
         }
 
 
-        pushButton();
+        if (color == BLUE)
+        {
+            if (colorSensorAlt.blue() > colorSensorAlt.red())
+            {
+                pushButton();
+            }
+        }
+
+        else if (color == RED)
+        {
+            if (colorSensorAlt.red() > colorSensorAlt.blue())
+            {
+                pushButton();
+            }
+        }
+
         setSweeperPower(0);
         sleep(200);
     }

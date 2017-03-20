@@ -81,6 +81,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
     {
         //STATE VARIABLES FOR LOOP:
         Stopwatch shooterTimer = null;
+        Stopwatch delayTimer = null;
 
         double swivelMovementStart = 0.0;
 
@@ -193,11 +194,13 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                             else if (gamepad1.dpad_right) setStrafePower(0.40);
                             else if (gamepad1.dpad_left) setStrafePower(-0.40);
                             */
+                            /*
                             if (gamepad1.dpad_up) setDrivePower(-0.21);
                             else if (gamepad1.dpad_down) setDrivePower(0.21);
                             else if (gamepad1.dpad_right) setStrafePower(0.34);
                             else if (gamepad1.dpad_left) setStrafePower(-0.34);
                             else setDrivePower(0);
+                            */
                         } else {
                             setDrivePower(0);
                         }
@@ -275,6 +278,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             {
                 if (teleOpShootingState == SHOOTER_OFF)
                 {
+                    moveRamp(RAMP_IN);
                     shoot.mResume();
                     shooterTimer = new Stopwatch();
                     teleOpShootingState = SHOOTER_ON;
@@ -292,6 +296,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                         moveDoor(DOOR_OPEN);
                         fireWhenReady = false;
                         shooterTimer = null;
+                        delayTimer = new Stopwatch();
                         teleOpShootingState = SHOOTER_FIRING;
                     }
                 }
@@ -299,7 +304,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 else if (teleOpShootingState == SHOOTER_FIRING)
                 {
                     shoot.mSuspend();
+                    delayTimer = null;
                     moveDoor(DOOR_CLOSED);
+                    moveRamp(RAMP_OPEN);
                     teleOpShootingState = SHOOTER_OFF;
                 }
 
@@ -320,6 +327,14 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     moveDoor(DOOR_CLOSED);
                 }
                 */
+            }
+
+            if(teleOpShootingState == SHOOTER_FIRING)
+            {
+                if(delayTimer.time() > 400)
+                {
+                    moveRamp(RAMP_OPEN);
+                }
             }
 
                 /*else if (gamepad2.x)
@@ -369,20 +384,28 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 {
                     if(hookServo.getPosition() == HOOK_IN)
                     {
-                        moveLiftClamp(CLAMP_RELEASE);
+                        moveLiftClamp(LIFT_CLAMP_RELEASE);
                         moveHook(HOOK_RELEASE);
                     }
 
                     else if(hookServo.getPosition() == HOOK_RELEASE)
                     {
-                        moveLiftClamp(CLAMP_IN);
+                        moveLiftClamp(LIFT_CLAMP_IN);
                         moveHook(HOOK_IN);
                     }
                 }
 
                 if ((gamepad1.dpad_left && !prevGamepad1.dpad_left))
                 {
+                    if(ballClampServo.getPosition() == BALL_CLAMP_IN)
+                    {
+                        moveBallClamp(BALL_CLAMP_RELEASE);
+                    }
 
+                    else if(ballClampServo.getPosition() == BALL_CLAMP_RELEASE)
+                    {
+                        moveBallClamp(BALL_CLAMP_IN);
+                    }
                 }
             }
 
@@ -396,20 +419,28 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 {
                     if(hookServo.getPosition() == HOOK_IN)
                     {
-                        moveLiftClamp(CLAMP_RELEASE);
+                        moveLiftClamp(LIFT_CLAMP_RELEASE);
                         moveHook(HOOK_RELEASE);
                     }
 
                     else if(hookServo.getPosition() == HOOK_RELEASE)
                     {
-                        moveLiftClamp(CLAMP_IN);
+                        moveLiftClamp(LIFT_CLAMP_IN);
                         moveHook(HOOK_IN);
                     }
                 }
 
                 if ((gamepad2.dpad_left && !prevGamepad2.dpad_left))
                 {
+                    if(ballClampServo.getPosition() == BALL_CLAMP_IN)
+                    {
+                        moveBallClamp(BALL_CLAMP_RELEASE);
+                    }
 
+                    else if(ballClampServo.getPosition() == BALL_CLAMP_RELEASE)
+                    {
+                        moveBallClamp(BALL_CLAMP_IN);
+                    }
                 }
             }
 

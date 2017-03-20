@@ -150,6 +150,9 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double DOOR_INIT = 1.0;
     protected static final double DOOR_CLOSED = 1.0;
 
+    protected static final double RAMP_IN = 0.3;
+    protected static final double RAMP_OPEN = 1.0;
+
     protected static final double RP_IN = 0.0;
     protected static final double RP_RELEASE = 0.04;
     protected static final double RP_RETRACTED = 0.03;
@@ -158,8 +161,12 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_IN = 0.6;
     protected static final double HOOK_RELEASE = 0.96;
 
-    protected static final double CLAMP_IN = 0.3;
-    protected static final double CLAMP_RELEASE = 0.8;
+    protected static final double LIFT_CLAMP_IN = 0.2;
+    protected static final double LIFT_CLAMP_RELEASE = 0.7;
+
+    protected static final double BALL_CLAMP_IN = 1.0;
+    protected static final double BALL_CLAMP_CLAMP = 0.5;
+    protected static final double BALL_CLAMP_RELEASE = 0.0;
 
     protected static final double TARGET_VOLTAGE = 12.5;
     //protected static final double TARGET_VELOCITY = 1.1e-6;
@@ -197,9 +204,11 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected int[] driveMotorInitValues = new int[4];
 
     protected Servo doorServo;
+    protected Servo rampServo;
     protected Servo autoExtendServo;
-    protected Servo clampServo;
+    protected Servo liftClampServo;
     protected Servo hookServo;
+    protected Servo ballClampServo;
 
     //SENSORS:
 
@@ -285,9 +294,11 @@ public abstract class OpMode_5220 extends LinearOpMode
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
 
         doorServo = hardwareMap.servo.get ("dServo");
+        rampServo = hardwareMap.servo.get("rServo");
         autoExtendServo = hardwareMap.servo.get("rpServo");
         hookServo = hardwareMap.servo.get("hServo");
-        clampServo = hardwareMap.servo.get("cServo");
+        liftClampServo = hardwareMap.servo.get("lcServo");
+        ballClampServo = hardwareMap.servo.get("bcServo");
 
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
@@ -299,8 +310,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorAlt.enableLed(false);
         colorSensorDown.enableLed(true);
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
-        touchSensorFront = hardwareMap.touchSensor.get("tSensor");
-        currentSensor = hardwareMap.analogInput.get("current");
+        //touchSensorFront = hardwareMap.touchSensor.get("tSensor");
+        //currentSensor = hardwareMap.analogInput.get("current");
     }
 
     public void initialize()
@@ -308,7 +319,9 @@ public abstract class OpMode_5220 extends LinearOpMode
         moveRackAndPinion(RP_IN);
         moveHook(HOOK_IN);
         moveDoor(DOOR_INIT);
-        moveLiftClamp(CLAMP_IN);
+        moveRamp(RAMP_IN);
+        moveLiftClamp(LIFT_CLAMP_IN);
+        moveBallClamp(BALL_CLAMP_IN);
 
         waitFullCycle();
 /*
@@ -354,6 +367,8 @@ public abstract class OpMode_5220 extends LinearOpMode
         voltagePID = new PIDCalculator();
         velocityBangBang = new BangBangCalculator();
         flywheelVelocity = new VelocityCalculator();
+
+        moveRamp(RAMP_OPEN);
 
         main();
         end();
@@ -406,9 +421,6 @@ public abstract class OpMode_5220 extends LinearOpMode
             debugLoopOn = true;
             while (debugLoopOn && opModeIsActive())
             {
-                double input = currentSensor.getVoltage();
-                double current = ((input + 30) / 60) * 1023;
-
                 yaw = df.format(navX.getYaw());
                 pitch = df.format(navX.getPitch());
                 roll = df.format(navX.getRoll());
@@ -426,7 +438,6 @@ public abstract class OpMode_5220 extends LinearOpMode
                 telemetry.addData ("8", "Y,P,R,FH: " + yprf);
 
                 telemetry.addData("9", "Voltage: " + voltage);
-                telemetry.addData("10,", "Current: " + current);
 
                 //waitOneFullHardwareCycle();
                 telemetry.update();
@@ -1425,7 +1436,17 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     public final void moveLiftClamp(double position)
     {
-        clampServo.setPosition(position);
+        liftClampServo.setPosition(position);
+    }
+
+    public final void moveBallClamp(double position)
+    {
+        ballClampServo.setPosition(position);
+    }
+
+    public final void moveRamp(double position)
+    {
+        rampServo.setPosition(position);
     }
 
     public final boolean isBallLoaded () //use sensor soon
@@ -1610,6 +1631,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             try
             {
+                /*
                 while(!opModeHasBeenActive || runConditions()) //should keep running
                 {
                     if (opModeIsActive()) opModeHasBeenActive = true;
@@ -1626,6 +1648,23 @@ public abstract class OpMode_5220 extends LinearOpMode
                         if(stopped) break;
                     }
                 }
+                */
+                while(runConditions())
+                {
+                    shoot();
+
+                    synchronized (this)
+                    {
+                        while(suspended)
+                        {
+                            stopShooting();
+                            wait();
+                        }
+                        if(stopped) break;
+                    }
+
+                }
+
             } catch(InterruptedException exc){}
         }
 

@@ -58,12 +58,13 @@ public class Autonomous_5220 extends OpMode_5220
     public static final int END_NORMAL_RAMP = 3;
     public static final int END_FAR_RAMP = 4;
     public static final int END_FAR_CAP_BALL = 5;
-    public static final int END_FAR_BLOCK_BALL = 6;
-    public static final int END_FAR_BLOCK_BEACON = 7;
-    public static final int END_FAR_STOP = 8;
-    public static final int END_AIM_CAP_BALL = 9;
-    public static final int END_AIM_RAMP = 10;
-    public static final int NUM_ENDS = 111;
+    public static final int END_FAR_RAM_BALL = 6;
+    public static final int END_FAR_BLOCK_BALL = 7;
+    public static final int END_FAR_BLOCK_BEACON = 8;
+    public static final int END_FAR_STOP = 9;
+    public static final int END_AIM_CAP_BALL = 10;
+    public static final int END_AIM_RAMP = 11;
+    public static final int NUM_ENDS = 12;
 
     private double overLineTime = 950;
 
@@ -304,6 +305,7 @@ public class Autonomous_5220 extends OpMode_5220
                 case END_NORMAL_RAMP: return "NORMAL: RAMP";
                 case END_FAR_RAMP: return "FAR: RAMP";
                 case END_FAR_CAP_BALL: return "FAR: CAP BALL";
+                case END_FAR_RAM_BALL: return "FAR: RAM BALL";
                 case END_FAR_BLOCK_BALL: return "FAR: BLOCK CAP BALL";
                 case END_FAR_BLOCK_BEACON: return "FAR: BLOCK BEACON";
                 case END_FAR_STOP: return "FAR: STOP";
@@ -603,24 +605,6 @@ public class Autonomous_5220 extends OpMode_5220
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
-        }
-    }
-
-    private void startToWall ()
-    {
-        if (color == BLUE)
-        {
-            move(-7, 0.4);
-            rotateEncoder(-9.2);
-            move(-11, 0.4);
-        }
-
-        else if (color == RED)
-        {
-            rotateEncoder(-12.5);
-            move(-44.7);
-            rotateEncoder(9.1);
-            strafeTime(1000, 0.5);
         }
     }
 
@@ -961,7 +945,24 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    //TODO
+    private void farShootingToRamBall()
+    {
+        if (color == RED)
+        {
+            rotateEncoder(5);
+            move (47, 0.8, ENCODER);
+            rotateEncoder(-12);
+            moveTime (1400, 1.0);
+            while (gameTimer.time() < 10000);
+            strafeTime(500, 0.6);
+        }
+
+        else if (color == BLUE)
+        {
+
+        }
+    }
+
     private void farShootingToBlockBall()
     {
         if (color == RED)
@@ -985,19 +986,12 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
+            /*
             rotateEncoder(-13);
             move(39);
             rotateEncoder(-10.8);
 
             while(gameTimer.time() < 10750 && runConditions());
-
-            /*
-            move(36.5);
-            strafe(11.7);
-            move(20);
-            sleep(3500);
-            move(-20);
-            */
 
             move(35.2);
             rotateEncoder(17.5);
@@ -1005,6 +999,21 @@ public class Autonomous_5220 extends OpMode_5220
             strafe(11.7);
             sleep(3000);
             strafe(-17);
+            */
+
+            //EXPERIMENTAL, using cap ball:
+            rotateEncoder(5);
+            move (55, 0.8, ENCODER);
+            rotateEncoder(14);
+            //put cap ball prongs down
+            move(32, 0.4, ENCODER);
+            //lift prongs up a teensy bit
+            move (-5, 0.4, ENCODER);
+            rotateEncoder(-10);
+            while (gameTimer.time() < 10000);
+            move (40);
+
+
 
         }
 
@@ -1082,6 +1091,11 @@ public class Autonomous_5220 extends OpMode_5220
             else if (endPath == END_FAR_CAP_BALL)
             {
                 farShootingToCapBall();
+            }
+
+            else if (endPath == END_FAR_RAM_BALL)
+            {
+                farShootingToRamBall();
             }
 
             else if (endPath == END_FAR_BLOCK_BALL)

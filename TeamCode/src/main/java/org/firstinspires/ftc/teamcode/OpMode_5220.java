@@ -164,8 +164,8 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double LIFT_CLAMP_IN = 0.2;
     protected static final double LIFT_CLAMP_RELEASE = 0.7;
 
-    protected static final double BALL_CLAMP_IN = 1.0;
-    protected static final double BALL_CLAMP_CLAMP = 0.5;
+    protected static final double BALL_CLAMP_IN = 0.97;
+    protected static final double BALL_CLAMP_CLAMP = 0.34;
     protected static final double BALL_CLAMP_RELEASE = 0.0;
 
     protected static final double TARGET_VOLTAGE = 12.5;

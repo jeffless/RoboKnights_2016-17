@@ -70,11 +70,11 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = BLUE; //arbitrary default
-    private int startPosition = START_NORMAL;
+    private boolean color = RED; //arbitrary default
+    private int startPosition = START_FAR;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
-    private int endPath = END_NORMAL_CAP_BALL;
+    private int endPath = END_FAR_BLOCK_BALL;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -335,9 +335,12 @@ public class Autonomous_5220 extends OpMode_5220
     private void shootAutonomousBalls()
     {
         shoot.mResume();
+        moveRamp(RAMP_IN);
         sleep(2100);
         moveDoor(DOOR_OPEN);
-        sleep(2000);
+        sleep(400);
+        moveRamp(RAMP_OPEN);
+        sleep(1200);
         moveDoor(DOOR_CLOSED);
         sleep(100);
         shoot.mSuspend();
@@ -908,8 +911,9 @@ public class Autonomous_5220 extends OpMode_5220
             /*move(11, 0.6);
             rotateEncoder(20.5, 0.6); */
             move(13.2, 0.82, ENCODER);
-            sleep(750);
-            rotateEncoder(19.6, 0.6);
+            sleep(350);
+            rotateEncoder(21, 0.7);
+            //move (1, 0.6);
         }
     }
 
@@ -949,12 +953,18 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
-            rotateEncoder(5);
-            move (47, 0.8, ENCODER);
-            rotateEncoder(-12);
-            moveTime (1400, 1.0);
+            rotateEncoder(-7);
+            move (19, 0.9);
+            rotateEncoder(11.8);
+            //moveTime (1500, -1.0);
+            setRightDrivePower(-0.45);
+            setLeftDrivePower(-0.9);
+            sleep(1600);
+            stopDrivetrain();
             while (gameTimer.time() < 10000);
-            strafeTime(500, 0.6);
+            move (2, 0.5);
+            moveTime (800, -0.7);
+            strafeTime(1000, -0.6);
         }
 
         else if (color == BLUE)
@@ -967,11 +977,21 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
+            /*
             rotateEncoder(-13);
             move(34);
             rotateEncoder(-16);
             while(gameTimer.time() < 10750 && runConditions());
             move(28);
+            */
+
+            strafe (3.7);
+            while(gameTimer.time() < 10700);
+            move (-25.46);
+            rotateEncoder(-17.2);
+            moveTime (1000, -0.6);
+
+
         }
 
         else if (color == BLUE)

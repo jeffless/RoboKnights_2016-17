@@ -369,6 +369,9 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
             if ((gamepad1.b && !prevGamepad1.b) || (gamepad2.b && !prevGamepad2.b))
                 moveDoor(doorServo.getPosition() != DOOR_OPEN ? DOOR_OPEN : DOOR_CLOSED);
 
+            if ((gamepad1.x && !prevGamepad1.x) || (gamepad2.x && !prevGamepad2.x))
+                moveRamp(rampServo.getPosition() != RAMP_OPEN ? RAMP_OPEN : RAMP_IN);
+
             if ((gamepad1.y && !prevGamepad1.y) || (gamepad2.y && !prevGamepad2.y))
                 moveRackAndPinion(autoExtendServo.getPosition() != RP_IN ? RP_IN : RP_OUT);
 
@@ -386,25 +389,27 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     {
                         moveLiftClamp(LIFT_CLAMP_RELEASE);
                         moveHook(HOOK_RELEASE);
+                        moveBallClamp(BALL_CLAMP_RELEASE);
                     }
 
                     else if(hookServo.getPosition() == HOOK_RELEASE)
                     {
                         moveLiftClamp(LIFT_CLAMP_IN);
                         moveHook(HOOK_IN);
+                        moveBallClamp(BALL_CLAMP_IN);
                     }
                 }
 
                 if ((gamepad1.dpad_left && !prevGamepad1.dpad_left))
                 {
-                    if(ballClampServo.getPosition() == BALL_CLAMP_IN)
+                    if(ballClampServo.getPosition() == BALL_CLAMP_IN || ballClampServo.getPosition() == BALL_CLAMP_CLAMP)
                     {
                         moveBallClamp(BALL_CLAMP_RELEASE);
                     }
 
                     else if(ballClampServo.getPosition() == BALL_CLAMP_RELEASE)
                     {
-                        moveBallClamp(BALL_CLAMP_IN);
+                        moveBallClamp(BALL_CLAMP_CLAMP);
                     }
                 }
             }

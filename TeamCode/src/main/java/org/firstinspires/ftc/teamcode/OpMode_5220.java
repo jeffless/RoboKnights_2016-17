@@ -1039,31 +1039,30 @@ public abstract class OpMode_5220 extends LinearOpMode
         int encoderCount = distanceToStrafeEncoderCount(distance);
         writeToLog("STRAFING: Distance = " + distance + ", Encoder Count = " + encoderCount + ", Mode = " + getModeText(mode) + ", Power = " + power);
         writeToLog("STRAFING: UnReset encoder values are LFM: " + getEncoderValue(leftFrontMotor) + ", " + getEncoderValue(rightFrontMotor));
-        //navX.zeroYaw();
+        navX.zeroYaw();
 
         double powerChange = 0;
         double updateTime = ((mode == ENCODER) ? ENCODER_SYNC_UPDATE_TIME : GYRO_SYNC_UPDATE_TIME);
 
         resetDriveEncoders();
         writeToLog("STRAFING: Initialized encoder values (should be 0) are LFM: " + getEncoderValue(leftFrontMotor) + ", RFM = " + getEncoderValue(rightFrontMotor));
-/*
+
         int i = 0;
         int prevYawsSize = 7;
         ArrayList<Double> prevYaws = new ArrayList<Double>(prevYawsSize);
         for (int j = 0; j < prevYawsSize; j++) prevYaws.add(0.0);
-*/
+
         setStrafePower(power);
 
 
-        //double prevYaw;
+        double prevYaw;
 
         while (runConditions() && !strafeEncodersHaveReached(encoderCount)) //change back to runConditions if it works, change back to driveEncodersHaveReached if it works
         {
-            //if (i >= 2) i = 0;
+            if (i >= 2) i = 0;
 
             if (mode != NORMAL)
             {
-                /*
                 if (mode == ENCODER)
                 {
                     double frontDifference = getEncoderValue(leftFrontMotor) - getEncoderValue(rightFrontMotor);
@@ -1107,7 +1106,6 @@ public abstract class OpMode_5220 extends LinearOpMode
                 }
                 if (i == 0) writeToLog("IMU YAW: " + navX.getYaw());
                 i++;
-                */
             }
 
             //waitFullCycle();

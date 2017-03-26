@@ -316,9 +316,9 @@ public abstract class OpMode_5220 extends LinearOpMode
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         //touchSensorFront = hardwareMap.touchSensor.get("tSensor");
         //currentSensor = hardwareMap.analogInput.get("current");
-        pixy = hardwareMap.i2cDevice.get("pixy");
-        pixyReader = new I2cDeviceSynchImpl(pixy, pixyAddress, false);
-        pixyReader.engage();
+        //pixy = hardwareMap.i2cDevice.get("pixy");
+        //pixyReader = new I2cDeviceSynchImpl(pixy, pixyAddress, false);
+        //pixyReader.engage();
     }
 
     public void initialize()

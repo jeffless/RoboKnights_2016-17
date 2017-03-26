@@ -224,6 +224,10 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected TouchSensor touchSensorFront;
     protected AnalogInput currentSensor;
 
+    protected I2cAddr pixyAddress = new I2cAddr(0x54);
+    protected I2cDevice pixy;
+    protected I2cDeviceSynch pixyReader;
+
     //OTHER GLOBAL VARIABLES:
 
     //protected FtcRobotControllerActivity ftcRCA;
@@ -312,6 +316,9 @@ public abstract class OpMode_5220 extends LinearOpMode
         //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
         //touchSensorFront = hardwareMap.touchSensor.get("tSensor");
         //currentSensor = hardwareMap.analogInput.get("current");
+        pixy = hardwareMap.i2cDevice.get("pixy");
+        pixyReader = new I2cDeviceSynchImpl(pixy, pixyAddress, false);
+        pixyReader.engage();
     }
 
     public void initialize()
@@ -1737,6 +1744,24 @@ public abstract class OpMode_5220 extends LinearOpMode
         private boolean liftStopped()
         {
             return(liftMotor.getPower() == 0);
+        }
+    }
+
+    public class CameraThread implements Runnable
+    {
+        byte[] sensorCache;
+        byte[] write;
+
+        @Override
+        public void run()
+        {
+            pixyReader.write(0x51, write, false);
+            sensorCache = pixyReader.read(0, 14);
+        }
+
+        public double getX()
+        {
+            return sensorCache[0] & 0xFF;
         }
     }
 

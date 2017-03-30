@@ -31,49 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 
-//import com.qualcomm.ftcrobotcontroller.FtcRobotControllerActivity;
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.*;
-import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.util.*;
 
 import com.kauailabs.navx.ftc.AHRS;
-import com.vuforia.HINT;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.concurrent.RunnableFuture;
-//hello!
-
-//TRY TO ADD METHODS FOR STRAFING DIAGONALLY (USING ONLY TWO WHEELS)
-
-//Currently using FTC SDK 2.2
 
 public abstract class OpMode_5220 extends LinearOpMode
 {
@@ -169,8 +142,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double BALL_CLAMP_RELEASE = 0.0;
 
     protected static final double TARGET_VOLTAGE = 12.5;
-    //protected static final double TARGET_VELOCITY = 1.1e-6;
-    protected static final double TARGET_VELOCITY = 2.945e-6; //for 7 encoder
+    protected static final double TARGET_VELOCITY = 2.945e-6;
 
     protected static final double TOLERANCE = 8.1e-7;
 
@@ -178,7 +150,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 
-    //protected static final double VELOCITY_P = 9000;
     protected static final double VELOCITY_P = 7.2;
     protected static final double VELOCITY_I = 0.05;
     protected static final double VELOCITY_D = 0.0;
@@ -236,11 +207,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected Stopwatch gameTimer;
     protected int phase = HAS_NOT_STARTED;
 
-    protected VuforiaLocalizer vuforia;
-    protected VuforiaTrackables beacons;
-
-    protected MediaPlayer mediaPlayer;
-    public static final boolean MUSIC_ON = true;
 
     protected static double voltage = 0;
 
@@ -254,8 +220,6 @@ public abstract class OpMode_5220 extends LinearOpMode
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
     {
         phase = SETUP;
-
-        //ftcRCA = FtcRobotControllerActivity.ftcRCA;
 
         hardwareMap.logDevices();
 
@@ -313,8 +277,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorFront.enableLed(false);
         colorSensorAlt.enableLed(false);
         colorSensorDown.enableLed(true);
-        //gyroSensor = hardwareMap.gyroSensor.get("gSensor");
-        //touchSensorFront = hardwareMap.touchSensor.get("tSensor");
         //currentSensor = hardwareMap.analogInput.get("current");
         //pixy = hardwareMap.i2cDevice.get("pixy");
         //pixyReader = new I2cDeviceSynchImpl(pixy, pixyAddress, false);
@@ -331,16 +293,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         moveBallClamp(BALL_CLAMP_IN);
 
         waitFullCycle();
-/*
-        gyroSensor.calibrate();
-        while (runConditions() && gyroSensor.isCalibrating())
-        {
 
-        }
-        waitFullCycle();
-        gyroSensor.resetZAxisIntegrator();
-        waitFullCycle();
-*/
         navX.zeroYaw();
 
         phase = INIT;
@@ -446,7 +399,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
                 telemetry.addData("9", "Voltage: " + voltage);
 
-                //waitOneFullHardwareCycle();
                 telemetry.update();
             }
         }
@@ -510,7 +462,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         int startTime = gameTimer.time();
         while (runConditions() && (gameTimer.time() < startTime + millis))
         {
-            //waitFullCycle();
+
         }
         return;
     }
@@ -562,12 +514,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         if(yaw < 0) return 360 - (Math.abs(yaw % 360));
         else return (yaw%360);
     }
-/*
-    public void restartRobot()
-    {
-        ftcRCA.requestRobotRestart();
-    }
-*/
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //MOVEMENT:
@@ -607,9 +554,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         setMotorPower (leftBackMotor, -power);
         setMotorPower (rightBackMotor, power);
     }
-
-    //add setLeftStrafePower and setRightStrafePower once I figure out turning which wheels makes it go where.
-
 
     public final void stopDrivetrain ()
     {
@@ -1499,31 +1443,6 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         public double getPID()
         {
-            /*
-            if(error > 0.006)
-            {
-                return constant;
-            }
-
-            else
-            {
-                derivative = error - lastError;
-
-                if (Math.abs(error) < 0.006)
-                {
-                    integral += error;
-                }
-
-                else
-                {
-                    integral = 0;
-                }
-
-                lastError = error;
-                return (kP * error) + (kI * integral) + (kD * derivative) + constant;
-            }
-            */
-
             derivative = error - lastError;
 
             if (Math.abs(error) < 0.006)
@@ -1604,7 +1523,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         setMotorPower(flywheelLeft, motorOut);
         setMotorPower(flywheelRight, motorOut);
 
-        //sleep(30);
         sleep(80);
     }
 
@@ -1636,24 +1554,6 @@ public abstract class OpMode_5220 extends LinearOpMode
         {
             try
             {
-                /*
-                while(!opModeHasBeenActive || runConditions()) //should keep running
-                {
-                    if (opModeIsActive()) opModeHasBeenActive = true;
-                    shoot();
-
-                    synchronized (this)
-                    {
-                        while(suspended)
-                        {
-                            if (opModeIsActive()) opModeHasBeenActive = true;
-                            stopShooting();
-                            wait();
-                        }
-                        if(stopped) break;
-                    }
-                }
-                */
                 while(runConditions())
                 {
                     shoot();
@@ -1769,60 +1669,5 @@ public abstract class OpMode_5220 extends LinearOpMode
     public double getFloorBrightness ()
     {
         return (colorSensorDown.red() + colorSensorDown.green() + colorSensorDown.blue());
-    }
-
-    //JUST FOR FUN:
-/*
-    public void playMusic (int resid)
-    {
-        if (runConditions() && !MUSIC_ON) return;
-        mediaPlayer = MediaPlayer.create(ftcRCA, resid);
-        mediaPlayer.start();
-    }
-
-    public void stopMusic ()
-    {
-        if (mediaPlayer == null) return;
-        mediaPlayer.stop();
-        mediaPlayer = null;
-    }
-    */
-
-    public void initializeVuforia(){
-        VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        params.vuforiaLicenseKey = "AcjcUvP/////AAAAGZk8Oo2BiUH4lYtmypMLxPoh5M3gwDE8WJsu13qi2h2KT3hWI+28EgFYToXpq7lUI/2xGSArueKvAzg4" +
-                "+kgBe7jXAtv7l8U1v1wxVvVbrFXRuEBwUPYPNkqUPZeD+xiVlRVqPObIoBHTYfS6i+PtGBKu+lpOGCi2eIuTvhEawydEF17lD24K8ip9cWuVVIw6LAzBjckFU" +
-                "soVgCsmnOdsgQjxJ8xRr3nmO+O88LYAMvG9x+rLcjFIF9u7K6Xx54JvAa9aa1b+55CtclWL1eK76YcIT8uabochFK8iZytmVKAwqfxIHasdokE12cTCwvY9m" +
-                "D5KBHdLjwKPj6sjqjAWjEzcAW9GcSj6YBGcJNZRB5pU";
-        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
-
-        vuforia = ClassFactory.createVuforiaLocalizer(params);
-        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
-
-        beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
-
-        beacons.get(0).setName("Wheels");
-        beacons.get(1).setName("Tools");
-        beacons.get(2).setName("Lego");
-        beacons.get(3).setName("Gears");
-    }
-
-    public void trackBeacons(){
-        beacons.activate();
-        for(VuforiaTrackable beac : beacons) {
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
-
-            if(pose != null) {
-                VectorF translation = pose.getTranslation();
-
-                telemetry.addData(beac.getName() + "-Translation", translation);
-
-                double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
-
-                telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
-            }
-        }
-        telemetry.update();
     }
 }

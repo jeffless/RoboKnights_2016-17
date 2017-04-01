@@ -43,6 +43,17 @@ import com.qualcomm.robotcore.util.Range;
 
 //NOTE: Do NOT put waitFullCycle in loops. Only put in between other stuff
 
+/*
+
+For autonomous:
+
+Move: Forwards (Positive power) is Cap Ball Lift side
+Strafe: Positive Power is towards autonomous apparatus side.
+Rotate: Positive Power is Counter-Clockwise Rotation.
+
+
+ */
+
 @TeleOp(name = "Autonomous 5220", group = "Main")
 //@Disabled
 public class Autonomous_5220 extends OpMode_5220
@@ -1010,9 +1021,12 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == BLUE)
         {
-            while(gameTimer.time() < 10750 && runConditions());
-            move(-20);
-            strafe(12);
+            rotateEncoder(27.5);
+            strafe (-5);
+            while(gameTimer.time() < 10700 && runConditions());
+            move (-25.46);
+            rotateEncoder(15.5);
+            moveTime (1000, -0.6);
         }
     }
 

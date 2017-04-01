@@ -182,22 +182,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:visibility="invisible"
       android:text="" />
 
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="350dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/frameLayout">
-      <org.opencv.android.JavaCameraView
-          android:layout_width="fill_parent"
-          android:layout_height="fill_parent"
-          android:visibility="gone"
-          android:id="@+id/show_camera_activity_java_surface_view"
-          opencv:show_fps="true"
-          opencv:camera_id="any" />
-    </FrameLayout>
-
-
   </RelativeLayout>
 
   <WebView

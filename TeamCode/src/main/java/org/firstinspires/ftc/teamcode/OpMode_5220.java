@@ -34,6 +34,7 @@ package org.firstinspires.ftc.teamcode;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.kauailabs.navx.ftc.navXPIDController;
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
@@ -79,6 +80,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double ENCODER = 3;
     protected static final double GYRO = 4;
     protected static final double SLOW = 5;
+    protected static final double IMU = 6;
 
     protected static final double DETECT_NONE = 0;
     protected static final double DETECT_RED = 1;
@@ -154,6 +156,15 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double VELOCITY_I = 0.05;
     protected static final double VELOCITY_D = 0.0;
 
+    private final double TARGET_ANGLE_DEGREES = 0.0;
+    private final double TOLERANCE_DEGREES = 2.0;
+    private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
+    private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
+    private final double YAW_PID_P = 0.005;
+    private final double YAW_PID_I = 0.0;
+    private final double YAW_PID_D = 0.0;
+
+
     protected static final double ST_1 = 0.0;
     protected static final double ST_2 = 0.1;
 
@@ -215,6 +226,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected PIDCalculator velocityPID;
     protected BangBangCalculator velocityBangBang;
     protected VelocityCalculator flywheelVelocity;
+    protected navXPIDController yawPIDController;
 
 
     public void setup()//this and the declarations above are the equivalent of the pragmas in RobotC
@@ -281,6 +293,18 @@ public abstract class OpMode_5220 extends LinearOpMode
         //pixy = hardwareMap.i2cDevice.get("pixy");
         //pixyReader = new I2cDeviceSynchImpl(pixy, pixyAddress, false);
         //pixyReader.engage();
+
+                /* Create a PID Controller which uses the Yaw Angle as input. */
+        yawPIDController = new navXPIDController( navX,
+                navXPIDController.navXTimestampedDataSource.YAW);
+
+        /* Configure the PID controller */
+        yawPIDController.setSetpoint(TARGET_ANGLE_DEGREES);
+        yawPIDController.setContinuous(true);
+        yawPIDController.setOutputRange(MIN_MOTOR_OUTPUT_VALUE, MAX_MOTOR_OUTPUT_VALUE);
+        yawPIDController.setTolerance(navXPIDController.ToleranceType.ABSOLUTE, TOLERANCE_DEGREES);
+        yawPIDController.setPID(YAW_PID_P, YAW_PID_I, YAW_PID_D);
+        yawPIDController.enable(true);
     }
 
     public void initialize()
@@ -1069,6 +1093,60 @@ public abstract class OpMode_5220 extends LinearOpMode
         waitFullCycle();
         //waitFullCycle();
         sleep(99); //maybe reduce this if it wastes too much time to have this safety interval.
+    }
+
+    public final void strafeIMU (double distance, double power)
+    {
+        if (!runConditions()) return;
+
+        if (power * distance < 0)
+        {
+            power = -power;
+        }
+
+        int encoderCount = distanceToStrafeEncoderCount(distance);
+        navX.zeroYaw();
+
+        resetDriveEncoders();
+
+        int DEVICE_TIMEOUT_MS = 500;
+        navXPIDController.PIDResult yawPIDResult = new navXPIDController.PIDResult();
+
+        try
+        {
+            while(runConditions() && !strafeEncodersHaveReached(encoderCount) && !Thread.currentThread().isInterrupted())
+            {
+                if(yawPIDController.waitForNewUpdate(yawPIDResult, DEVICE_TIMEOUT_MS))
+                {
+                    if(yawPIDResult.isOnTarget())
+                    {
+                        setStrafePower(power);
+                    }
+
+                    else
+                    {
+                        double output = yawPIDResult.getOutput();
+                        setMotorPower(leftFrontMotor, Range.clip(power + output, -1.0, 1.0));
+                        setMotorPower(rightFrontMotor, Range.clip(-power - output, -1.0, 1.0));
+                        setMotorPower(leftBackMotor, Range.clip(-power + output, -1.0, 1.0));
+                        setMotorPower(rightBackMotor, Range.clip(power - output, -1.0, 1.0));
+                    }
+                }
+            }
+        }
+        catch(InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+
+        stopDrivetrain();
+        if (!runConditions()) return;
+        sleep(99); //maybe reduce this if it wastes too much time to have this safety interval.
+    }
+
+    public void strafeIMU(double distance)
+    {
+        strafeIMU(distance, DEFAULT_DRIVE_POWER);
     }
 
     public final void strafeTime(int time, double power)

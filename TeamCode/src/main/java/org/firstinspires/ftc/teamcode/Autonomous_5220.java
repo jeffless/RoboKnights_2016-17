@@ -81,7 +81,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = BLUE; //arbitrary default
+    private boolean color = RED; //arbitrary default
     private int startPosition = START_AIM;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
@@ -622,10 +622,18 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    private void startToFarBeacon()
+    private void aimStartToFarBeacon()
     {
         if (color == BLUE)
         {
+            move (4, 0.6, ENCODER);
+            rotateEncoder(-3.7);
+            move(64);
+            rotateEncoder(3.7);
+            strafeTime(1100, 0.7);
+            stopDrivetrain();
+
+            /*
             move(70);
             setDrivePower(0.3);
             waitForLine();
@@ -635,19 +643,31 @@ public class Autonomous_5220 extends OpMode_5220
             move(3);
             strafeTime(1000, 0.7);
             stopDrivetrain();
+             */
+
         }
 
         else if (color == RED)
         {
+            /*
             setDrivePower(0.9);
             waitForLine();
             rotateEncoder(-9);
             strafe(17);
+            */
+
+            move (-4, 0.6, ENCODER);
+            rotateEncoder(3);
+            move(-80);
+            rotateEncoder(-4);
+            strafeTime(1200, 0.7);
+            stopDrivetrain();
         }
     }
 
-    private void findButton()
+    private void findButton(boolean direction)
     {
+        /* OLD:
         if(startPosition == START_NORMAL || startPosition == START_FAR)
         {
             if (color == BLUE)
@@ -680,6 +700,22 @@ public class Autonomous_5220 extends OpMode_5220
                 while (runConditions() && colorSensorFront.red() < 2) ;
                 stopDrivetrain();
             }
+        }
+
+        */
+
+        if (color == RED)
+        {
+            diagonalStrafeAgainstWall(direction);
+            while (runConditions() && colorSensorFront.red() < 2) ;
+            stopDrivetrain();
+        }
+
+        else if (color == BLUE) //ADD PROTECTION BY CHECKING OPPOSITE COLOR ISN'T DETECTED?
+        {
+            diagonalStrafeAgainstWall(direction);
+            while (runConditions() && colorSensorFront.blue() < 3) ;
+            stopDrivetrain();
         }
     }
 
@@ -693,19 +729,21 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void pushButtonsAlongWall ()
     {
-        if (runCollector && (color == RED)) setSweeperPower(0.95);
+        //if (runCollector && (color == RED)) setSweeperPower(0.95);
 
-        findButton();
+        //findButton(FORWARDS);
 
-        if(startPosition == START_NORMAL || startPosition == START_FAR)
+        if(startPosition == START_NORMAL)
         {
             if(color == BLUE)
             {
+                findButton(FORWARDS);
                 move(1.0, 0.8);
             }
 
             if(color == RED)
             {
+                findButton(BACKWARDS);
                 //move(0.5, 0.8);
             }
         }
@@ -714,16 +752,18 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                //move(0.8, 0.8);
+                findButton(FORWARDS);
+                move(0.8, 0.8);
             }
 
             if(color == RED)
             {
+                findButton(BACKWARDS);
                //move(0.2, 0.8);
             }
         }
 
-        if (color == BLUE)
+        /*if (color == BLUE)
         {
             if (colorSensorAlt.blue() > colorSensorAlt.red())
             {
@@ -737,24 +777,26 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 pushButton();
             }
-        }
+        } */
 
-        //pushButton();
+        pushButton();
         sleep(720);
         if(startPosition == START_NORMAL || startPosition == START_FAR) move ((color == BLUE ? 20: -23), 0.9, ENCODER);
         else if(startPosition == START_AIM) move((color == BLUE ? -26: 23), 0.9, ENCODER);
 
-        findButton();
+        //findButton();
 
         if(startPosition == START_NORMAL || startPosition == START_FAR)
         {
             if(color == BLUE)
             {
+                findButton(FORWARDS);
                 move(1.0, 0.8);
             }
 
             if(color == RED)
             {
+                findButton(BACKWARDS);
                 move(0.2, 0.8);
             }
         }
@@ -763,17 +805,19 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
+                findButton(BACKWARDS);
                 move(0.5, 0.8);
             }
 
             if(color == RED)
             {
+                findButton(FORWARDS);
                 move(0.2, 0.8);
             }
         }
 
 
-        if (color == BLUE)
+        /*if (color == BLUE)
         {
             if (colorSensorAlt.blue() > colorSensorAlt.red())
             {
@@ -788,6 +832,9 @@ public class Autonomous_5220 extends OpMode_5220
                 pushButton();
             }
         }
+        */
+
+        pushButton();
 
         setSweeperPower(0);
         sleep(200);
@@ -1085,32 +1132,34 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            strafe(-7);
-            rotateEncoder(34);
+            strafe(-10);
+            rotateEncoder(28);
         }
 
         else if(color ==  RED)
         {
+            strafe(-10);
+            rotateEncoder(-35);
 
         }
     }
 
     //TODO
-    private void shootingPositionToRamp()
+    private void aimShootingPositionToRamp()
     {
         if(color == BLUE)
         {
-            move(20);
+            moveTime(2000, 0.7);
         }
 
         else if(color ==  RED)
         {
-
+            moveTime(2000, -0.7);
         }
     }
 
     //TODO
-    private void shootingPositiongToCapBall()
+    private void aimShootingPositionToCapBall()
     {
         if(color == BLUE)
         {
@@ -1202,7 +1251,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if(startPosition == START_AIM)
         {
-            startToFarBeacon();
+            aimStartToFarBeacon();
             pushButtonsAlongWall();
 
             closeBeaconToShootingPosition();
@@ -1212,12 +1261,12 @@ public class Autonomous_5220 extends OpMode_5220
 
             if(endPath == END_AIM_CAP_BALL)
             {
-                shootingPositiongToCapBall();
+                aimShootingPositionToCapBall();
             }
 
             else if(endPath == END_AIM_RAMP)
             {
-                shootingPositionToRamp();
+                aimShootingPositionToRamp();
             }
         }
 

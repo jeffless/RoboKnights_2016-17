@@ -85,7 +85,7 @@ public class Autonomous_5220 extends OpMode_5220
     private int startPosition = START_AIM;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
-    private int endPath = END_AIM_RAMP;
+    private int endPath = END_AIM_CAP_BALL;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -867,6 +867,27 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
+    private void alignWIthCloseLine()
+    {
+        if(color == BLUE)
+        {
+            move(-4);
+            diagonalStrafeAgainstWall(FORWARDS, SLOW);
+            waitForLine();
+            stopDrivetrain();
+            sleep(150);
+        }
+
+        if(color == RED)
+        {
+            move(7);
+            diagonalStrafeAgainstWall(BACKWARDS, SLOW);
+            waitForLine();
+            stopDrivetrain();
+            sleep(150);
+        }
+    }
+
     private void farBeaconToBall()
     {
         if(runCollector)
@@ -1133,7 +1154,7 @@ public class Autonomous_5220 extends OpMode_5220
         if(color == BLUE)
         {
             strafe(-10);
-            rotateEncoder(28);
+            rotateEncoder(31);
         }
 
         else if(color ==  RED)
@@ -1144,17 +1165,16 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    //TODO
     private void aimShootingPositionToRamp()
     {
         if(color == BLUE)
         {
-            moveTime(2000, 0.7);
+            moveTime(1400, 0.7);
         }
 
         else if(color ==  RED)
         {
-            moveTime(2000, -0.7);
+            moveTime(1400, -0.7);
         }
     }
 
@@ -1163,12 +1183,16 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-
+            rotateEncoder(16);
+            strafe(-10);
+            move(-26);
         }
 
         else if(color ==  RED)
         {
-
+            rotateEncoder(5);
+            strafe(13);
+            move(-26);
         }
     }
 
@@ -1253,6 +1277,8 @@ public class Autonomous_5220 extends OpMode_5220
         {
             aimStartToFarBeacon();
             pushButtonsAlongWall();
+
+            alignWIthCloseLine();
 
             closeBeaconToShootingPosition();
             sleep(800);

@@ -82,6 +82,11 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double SLOW = 5;
     protected static final double IMU = 6;
 
+    protected static final double DPAD_FORWARDS = 0;
+    protected static final double DPAD_BACKWARDS = 1;
+    protected static final double DPAD_STRAFE_LEFT = 2;
+    protected static final double DPAD_STRAFE_RIGHT = 3;
+
     protected static final double DETECT_NONE = 0;
     protected static final double DETECT_RED = 1;
     protected static final double DETECT_BLUE = 2;
@@ -136,7 +141,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_IN = 0.6;
     protected static final double HOOK_RELEASE = 0.96;
 
-    protected static final double LIFT_CLAMP_IN = 0.2;
+    protected static final double LIFT_CLAMP_IN = 0.3;
     protected static final double LIFT_CLAMP_RELEASE = 0.7;
 
     protected static final double BALL_CLAMP_IN = 0.97;
@@ -1132,6 +1137,11 @@ public abstract class OpMode_5220 extends LinearOpMode
                         setMotorPower(rightBackMotor, Range.clip(power - output, -1.0, 1.0));
                     }
                 }
+
+                else
+                {
+
+                }
             }
         }
         catch(InterruptedException e)
@@ -1581,7 +1591,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         /*First layer of PID that acts upon the battery level*/
 
         double voltageError = TARGET_VOLTAGE - voltage;
-        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.42); //0.57
+        voltagePID.setParameters(VOLTAGE_P, VOLTAGE_I, VOLTAGE_D, voltageError, 0.45); //0.57
         double voltageOut = voltagePID.getPID();
 
         /*Second layer of PID that acts upon the flywheel speed*/
@@ -1722,6 +1732,119 @@ public abstract class OpMode_5220 extends LinearOpMode
         private boolean liftStopped()
         {
             return(liftMotor.getPower() == 0);
+        }
+    }
+
+    public class DPadThread implements Runnable
+    {
+        private Thread thrd;
+
+        private boolean stop;
+        private double direction;
+
+        DPadThread(double direction)
+        {
+            thrd = new Thread(this);
+            stop = false;
+            this.direction = direction;
+            thrd.start();
+        }
+
+        public void run()
+        {
+            navX.zeroYaw();
+
+            int DEVICE_TIMEOUT_MS = 500;
+            navXPIDController.PIDResult yawPIDResult = new navXPIDController.PIDResult();
+
+            try{
+                while (runConditions() && !Thread.currentThread().isInterrupted())
+                {
+                    if(yawPIDController.waitForNewUpdate(yawPIDResult, DEVICE_TIMEOUT_MS))
+                    {
+                        if(yawPIDResult.isOnTarget())
+                        {
+                            if(direction == DPAD_FORWARDS)
+                            {
+                                setDrivePower(-0.34);
+                            }
+
+                            else if(direction == DPAD_BACKWARDS)
+                            {
+                                setDrivePower(0.34);
+                            }
+
+                            else if(direction == DPAD_STRAFE_RIGHT)
+                            {
+                                setStrafePower(0.40);
+                            }
+
+                            else if(direction == DPAD_STRAFE_LEFT)
+                            {
+                                setStrafePower(-0.40);
+                            }
+                        }
+
+                        else
+                        {
+                            double output = yawPIDResult.getOutput();
+
+                            if(direction == DPAD_FORWARDS)
+                            {
+                                setMotorPower(leftFrontMotor, Range.clip(-0.34 + output, -1.0, 1.0));
+                                setMotorPower(rightFrontMotor, Range.clip(-0.34 - output, -1.0, 1.0));
+                                setMotorPower(leftBackMotor, Range.clip(-0.34 + output, -1.0, 1.0));
+                                setMotorPower(rightBackMotor, Range.clip(-0.34 - output, -1.0, 1.0));
+                            }
+
+                            else if(direction == DPAD_BACKWARDS)
+                            {
+                                setMotorPower(leftFrontMotor, Range.clip(0.34 + output, -1.0, 1.0));
+                                setMotorPower(rightFrontMotor, Range.clip(0.34 - output, -1.0, 1.0));
+                                setMotorPower(leftBackMotor, Range.clip(0.34 + output, -1.0, 1.0));
+                                setMotorPower(rightBackMotor, Range.clip(0.34 - output, -1.0, 1.0));
+                            }
+
+                            else if(direction == DPAD_STRAFE_RIGHT)
+                            {
+                                setMotorPower(leftFrontMotor, Range.clip(0.40 + output, -1.0, 1.0));
+                                setMotorPower(rightFrontMotor, Range.clip(-0.40 - output, -1.0, 1.0));
+                                setMotorPower(leftBackMotor, Range.clip(-0.40 + output, -1.0, 1.0));
+                                setMotorPower(rightBackMotor, Range.clip(0.40 - output, -1.0, 1.0));
+                            }
+
+                            else if(direction == DPAD_STRAFE_LEFT)
+                            {
+                                setMotorPower(leftFrontMotor, Range.clip(-0.40 + output, -1.0, 1.0));
+                                setMotorPower(rightFrontMotor, Range.clip(0.40 - output, -1.0, 1.0));
+                                setMotorPower(leftBackMotor, Range.clip(0.40 + output, -1.0, 1.0));
+                                setMotorPower(rightBackMotor, Range.clip(-0.40 - output, -1.0, 1.0));
+                            }
+                        }
+                    }
+
+                    else
+                    {
+
+                    }
+
+                    synchronized (this)
+                    {
+                        if(stop) break;
+                    }
+                }
+            }
+
+            catch(InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+            }
+            stopDrivetrain();
+        }
+
+        synchronized void stopMoving()
+        {
+            stop = true;
         }
     }
 

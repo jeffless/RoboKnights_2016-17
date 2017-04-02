@@ -58,6 +58,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
     private ShootThread shoot;
     private VoltageThread voltage;
+    private DPadThread dPad;
 
     public ProgramType getProgramType ()
     {
@@ -201,6 +202,43 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                             else if (gamepad1.dpad_left) setStrafePower(-0.34);
                             else setDrivePower(0);
                             */
+
+                            /*
+                            if(dPad == null)
+                            {
+                                if(gamepad1.dpad_up) dPad = new DPadThread(DPAD_FORWARDS);
+                                else if(gamepad1.dpad_down) dPad = new DPadThread(DPAD_BACKWARDS);
+                                else if(gamepad1.dpad_right) dPad = new DPadThread(DPAD_STRAFE_RIGHT);
+                                else if(gamepad1.dpad_left) dPad = new DPadThread(DPAD_STRAFE_LEFT);
+                                else stopDrivetrain();
+                            }
+
+                            else
+                            {
+                                if(!gamepad1.dpad_up && prevGamepad1.dpad_up)
+                                {
+                                    dPad.stopMoving();
+                                    dPad = null;
+                                }
+                                else if(!gamepad1.dpad_down && prevGamepad1.dpad_down)
+                                {
+                                    dPad.stopMoving();
+                                    dPad = null;
+                                }
+                                else if(!gamepad1.dpad_right && prevGamepad1.dpad_right)
+                                {
+                                    dPad.stopMoving();
+                                    dPad = null;
+                                }
+                                else if(!gamepad1.dpad_left && prevGamepad1.dpad_left)
+                                {
+                                    dPad.stopMoving();
+                                    dPad = null;
+                                }
+
+                                else stopDrivetrain();
+                            }
+                            */
                         } else {
                             setDrivePower(0);
                         }
@@ -263,9 +301,8 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 setMotorPower(rightFrontMotor, rightFront);
             }
 
-            if (gamepad1.back && !prevGamepad1.back)
+            if (gamepad1.left_bumper && !prevGamepad1.left_bumper)
             {
-                //dPadMode = !dPadMode;
                 slowDriveOn = !slowDriveOn;
             }
 

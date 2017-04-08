@@ -32,27 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
-import com.qualcomm.robotcore.util.Range;
-
-
-//TODO:
-
-//IDEA: Use ultrasonic sensor to detect if we are being PATHed from proceding to the second beacon, and if that is the case, immediately drive back to the first beacon, re-align, then go shoot as if second beacon was never attempted.
-
-//Hello world.
-
-//NOTE: Do NOT put waitFullCycle in loops. Only put in between other stuff
 
 /*
-
 For autonomous:
 
 Move: Forwards (Positive power) is Cap Ball Lift side
 Strafe: Positive Power is towards autonomous apparatus side.
 Rotate: Positive Power is Counter-Clockwise Rotation.
-
-
- */
+*/
 
 @TeleOp(name = "Autonomous 5220", group = "Main")
 //@Disabled
@@ -337,7 +324,7 @@ public class Autonomous_5220 extends OpMode_5220
 
     public void test() //for debug, whenever we want to test something independent of the rest of the autonomous program
     {
-        while (runConditions());
+        //while (runConditions());
         strafeIMU(2000, 0.3);
         stopDrivetrain();
     }
@@ -964,7 +951,6 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    //TODO
     private void farBeaconToBallWithShooting()
     {
         if(color == BLUE)
@@ -1180,7 +1166,6 @@ public class Autonomous_5220 extends OpMode_5220
         }
     }
 
-    //TODO
     private void aimShootingPositionToCapBall()
     {
         if(color == BLUE)
@@ -1328,5 +1313,6 @@ public class Autonomous_5220 extends OpMode_5220
         }
 
         autonomous();
+        //test();
     }
 }

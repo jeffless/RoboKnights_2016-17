@@ -31,20 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
-import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.kauailabs.navx.ftc.navXPIDController;
-import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.util.*;
 
 import com.kauailabs.navx.ftc.AHRS;
-
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

@@ -31,8 +31,6 @@ import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.util.*;
 
-import org.firstinspires.ftc.teamcode.OpMode_5220;
-
 @TeleOp(name = "TeleOp 5220", group = "Main") //change to autonomous if making this called a teleop changes something for the worse
 //@Disabled
 public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long comment.
@@ -73,7 +71,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         g1Stick1Xinit = gamepad1.left_stick_x;
         g1Stick1Yinit = gamepad1.left_stick_y;
         moveDoor(DOOR_CLOSED);
-        //color = ftcRCA.color;
     }
 
     //MAIN PROGRAM:
@@ -83,8 +80,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         //STATE VARIABLES FOR LOOP:
         Stopwatch shooterTimer = null;
         Stopwatch delayTimer = null;
-
-        double swivelMovementStart = 0.0;
 
         boolean strafing = false;
         boolean reverse = false;
@@ -346,24 +341,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     moveRamp(RAMP_OPEN);
                     teleOpShootingState = SHOOTER_OFF;
                 }
-
-                //OLD SHOOTING CONTROL CODE:
-                /*
-                if(shoot.isSuspended())
-                {
-                    shoot.mResume();
-
-                    sleep(1200);
-                    moveDoor(DOOR_OPEN);
-
-                }
-
-                else
-                {
-                    shoot.mSuspend();
-                    moveDoor(DOOR_CLOSED);
-                }
-                */
             }
 
             if(teleOpShootingState == SHOOTER_FIRING)
@@ -373,20 +350,6 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     moveRamp(RAMP_OPEN);
                 }
             }
-
-                /*else if (gamepad2.x)
-                {
-                    setMotorPower(shooterMotor, 0.8);
-                    shooterChanged = true;
-                }
-
-                else if (gamepad2.y)
-                {
-                    setMotorPower(shooterMotor, -0.8);
-                    shooterChanged = true;
-                }
-
-                else setMotorPower(shooterMotor, 0.0); */
 
             if (gamepad1.right_bumper || gamepad2.right_bumper)
             {
@@ -514,11 +477,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
         waitFullCycle();
         colorSensorDown.enableLed(true);
         waitFullCycle();
-*.*/
-
-        /*runnable = new ShootThread();
-        shoot = new Thread (runnable);
-        shoot.start();*/
+        */
 
         shoot = new ShootThread();
         voltage = new VoltageThread();

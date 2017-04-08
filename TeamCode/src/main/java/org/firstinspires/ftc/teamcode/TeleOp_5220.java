@@ -323,7 +323,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
                 else if (teleOpShootingState == SHOOTER_ON) //THE ELSE HERE IS IMPORTANT
                 {
-                    if (shooterTimer.time() < 2100)
+                    if (shooterTimer.time() < 2800)
                     {
                         fireWhenReady = true;
                     }
@@ -368,7 +368,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
 
             if(teleOpShootingState == SHOOTER_FIRING)
             {
-                if(delayTimer.time() > 200)
+                if(delayTimer.time() > 400)
                 {
                     moveRamp(RAMP_OPEN);
                 }

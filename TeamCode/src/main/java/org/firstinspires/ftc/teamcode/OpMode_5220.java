@@ -153,7 +153,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
     protected static final double TOLERANCE = 8.1e-7;
 
-    protected static final double VOLTAGE_P = 0.20;
+    protected static final double VOLTAGE_P = 0.18;
     protected static final double VOLTAGE_I = 0.0;
     protected static final double VOLTAGE_D = 0.0;
 

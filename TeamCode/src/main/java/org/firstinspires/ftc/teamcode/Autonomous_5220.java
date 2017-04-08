@@ -81,11 +81,11 @@ public class Autonomous_5220 extends OpMode_5220
 
     private Autonomous_5220 opMode = this;
 
-    private boolean color = RED; //arbitrary default
-    private int startPosition = START_AIM;
+    private boolean color = BLUE; //arbitrary default
+    private int startPosition = START_FAR;
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
-    private int endPath = END_AIM_CAP_BALL;
+    private int endPath = END_FAR_CAP_BALL;
     private boolean runCollector = false;
 
     private ShootThread shoot;
@@ -338,6 +338,7 @@ public class Autonomous_5220 extends OpMode_5220
     public void test() //for debug, whenever we want to test something independent of the rest of the autonomous program
     {
         while (runConditions());
+        strafeIMU(2000, 0.3);
         stopDrivetrain();
     }
 
@@ -347,9 +348,9 @@ public class Autonomous_5220 extends OpMode_5220
     {
         shoot.mResume();
         moveRamp(RAMP_IN);
-        sleep(2100);
+        sleep(2800);
         moveDoor(DOOR_OPEN);
-        sleep(200);
+        sleep(400);
         moveRamp(RAMP_OPEN);
         sleep(1200);
         moveDoor(DOOR_CLOSED);
@@ -496,7 +497,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 setSweeperPower(1);
                 sleep(1800);
-                strafe(2);
+                strafe(4);
                 rotateEncoder(-7.1);
                 setSweeperPower(0);
             }
@@ -547,7 +548,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 move(-5, 0.64, ENCODER);
                 sleep(200);
-                rotateEncoder(-9.1);
+                rotateEncoder(-8.4);
                 sleep(200);
                 move(-18.9, 0.64, ENCODER);
             }
@@ -566,7 +567,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-21.9, 0.65);
+                move(-23.1, 0.65);
             }
 
             else if(color == RED)
@@ -582,9 +583,10 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                rotateEncoder(2, 0.7);
-                move (-10.8, 0.86);
-                rotateEncoder(-32, 0.7);
+                //rotateEncoder(2, 0.7);
+                move (-12.1, 0.86);
+                rotateEncoder(-31, 0.7);
+                move(1);
                 strafeTime(1000, 0.7);
                 stopDrivetrain();
             }
@@ -984,9 +986,9 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-17.1, 0.82, ENCODER);
+            move(-18.1, 0.82, ENCODER);
             sleep(350);
-            rotateEncoder(-24.8, 0.7);
+            rotateEncoder(-25.8, 0.7);
         }
 
         else if (color == RED)
@@ -1021,8 +1023,8 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == RED)
         {
-            rotateEncoder(-15.2);
-            move(37);
+            rotateEncoder(-18.5);
+            move(30);
         }
 
         else if (color == BLUE)

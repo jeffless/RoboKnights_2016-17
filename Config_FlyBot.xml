@@ -1,23 +1,25 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <Robot type="FirstInspires-FTC">
-    <MotorController name="Motor Controller 5" serialNumber="AL00XQ8T">
-        <Motor name="flywheel1" port="1" />
-        <Motor name="flywheel2" port="2" />
-    </MotorController>
     <MotorController name="Motor Controller 1" serialNumber="AL00UVMI">
         <Motor name="lf" port="1" />
         <Motor name="rf" port="2" />
     </MotorController>
+    <MotorController name="Motor Controller 5" serialNumber="AL00XQ8T">
+        <Motor name="flywheel1" port="1" />
+        <Motor name="flywheel2" port="2" />
+    </MotorController>
+    <ServoController name="Servo Controller 1" serialNumber="AL00XLSE">
+        <Servo name="rpServo" port="1" />
+        <Servo name="bcServo" port="3" />
+    </ServoController>
     <MotorController name="Motor Controller 2" serialNumber="AL00XUAH">
         <Motor name="lb" port="1" />
         <Motor name="rb" port="2" />
     </MotorController>
     <ServoController name="Servo Controller 4" serialNumber="AI02RN3S">
-        <Servo name="rpServo" port="1" />
         <Servo name="rServo" port="2" />
         <Servo name="hServo" port="3" />
         <Servo name="lcServo" port="4" />
-        <Servo name="bcServo" port="5" />
         <Servo name="dServo" port="6" />
     </ServoController>
     <DeviceInterfaceModule name="Device Interface Module 3" serialNumber="AL00VFCJ">

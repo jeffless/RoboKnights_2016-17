@@ -819,9 +819,31 @@ public abstract class OpMode_5220 extends LinearOpMode
         setDrivePower(power);
         //double prevYaw;
 
+        Stopwatch stallTimer = null;
+        double prevEncoder = 0;
+
         while (runConditions() && !driveEncodersHaveReached(encoderCount)) //change back to runConditions if it works, change back to driveEncodersHaveReached if it works
         {
             if (i >= 2) i = 0;
+
+            double totalEncoder = leftBackMotor.getCurrentPosition() + rightBackMotor.getCurrentPosition() + leftFrontMotor.getCurrentPosition() + rightFrontMotor.getCurrentPosition();
+            if( totalEncoder == prevEncoder && stallTimer == null)
+            {
+                stallTimer = new Stopwatch();
+            }
+
+            if(stallTimer != null && totalEncoder != prevEncoder)
+            {
+                stallTimer = null;
+            }
+
+            if(stallTimer.time() > 5000)
+            {
+                stopDrivetrain();
+                break;
+            }
+
+            prevEncoder = totalEncoder;
 
             if (mode != NORMAL)
             {

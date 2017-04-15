@@ -73,7 +73,6 @@ public class Autonomous_5220 extends OpMode_5220
     private boolean thirdBallOn = false;
     private int startWaitTime = 0; //in seconds, no need for non-integer numbers.
     private int endPath = END_AIM_CAP_BALL;
-    private boolean runCollector = false;
 
     private ShootThread shoot;
     private VoltageThread voltage;
@@ -107,10 +106,8 @@ public class Autonomous_5220 extends OpMode_5220
         private static final int THREE_BALLS = 2;
         private static final int WAIT = 3;
         private static final int PATH = 4;
-        private static final int COLLECTOR = 5;
 
-
-        private static final int NUM_SETTINGS = 6; //always make sure this is correct.
+        private static final int NUM_SETTINGS = 5; //always make sure this is correct.
 
         private int currentSetting = 0;
 
@@ -120,12 +117,11 @@ public class Autonomous_5220 extends OpMode_5220
         public void run ()
         {
             for (int i = 0; i < telemetryLines.length; i++) telemetryLines[i] = "";
-            telemetryLines[COLOR] = ("*Color: " + (color == RED ? "RED (Sweeper Against Wall)" : "BLUE (Lift Against Wall)"));
+            telemetryLines[COLOR] = ("*Color: " + (color == RED ? "RED " : "BLUE"));
             telemetryLines[START] = ("Start Position: " + startPositionToString(startPosition));
             telemetryLines[THREE_BALLS] = ("Third Ball: " + (thirdBallOn ? "ON" : "OFF"));
             telemetryLines[WAIT] = ("Wait Time: " + startWaitTime + " seconds");
             telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
-            telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
 
             writeLinesToTelemetry();
 
@@ -222,7 +218,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 color = !color;
 
-                telemetryLines[COLOR] = ("Color: " + (color == RED ? "RED (Sweeper Against Wall)" : "BLUE (Lift Against Wall)"));
+                telemetryLines[COLOR] = ("Color: " + (color == RED ? "RED " : "BLUE"));
             }
 
             else if (setting == START)
@@ -254,12 +250,6 @@ public class Autonomous_5220 extends OpMode_5220
                 telemetryLines[PATH] = ("End Path: " + endPathToString(endPath));
             }
 
-            else if (setting == COLLECTOR)
-            {
-                runCollector = !runCollector;
-                telemetryLines[COLLECTOR] = ("Run Collector: " + (runCollector ? "ON" : "OFF"));
-            }
-
             if (telemetryLines[currentSetting].charAt(0) != '*') //change to string equals comparison if this doesn't work
             {
                 telemetryLines[currentSetting] = "*" + telemetryLines[currentSetting];
@@ -288,7 +278,7 @@ public class Autonomous_5220 extends OpMode_5220
             {
                 case START_NORMAL: return "NORMAL";
                 case START_FAR: return "FAR (away from corner vortex)";
-                case START_AIM: return "AIM (angled at the far beacon line)";
+                case START_AIM: return "AIM (Far Beacon First)";
                 default: return "Error: Start Position Number.";
             }
         }
@@ -718,8 +708,6 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void pushButtonsAlongWall ()
     {
-        //if (runCollector && (color == RED)) setSweeperPower(0.95);
-
         //findButton(FORWARDS);
 
         if(startPosition == START_NORMAL)
@@ -842,11 +830,6 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            if(runCollector)
-            {
-                setSweeperPower(0.95);
-            }
-
             move (-2);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
@@ -879,11 +862,6 @@ public class Autonomous_5220 extends OpMode_5220
 
     private void farBeaconToBall()
     {
-        if(runCollector)
-        {
-            setSweeperPower(1.0);
-        }
-
         if (color == BLUE)
         {
             strafe(-5);

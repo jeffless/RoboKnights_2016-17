@@ -426,25 +426,27 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     {
                         moveLiftClamp(LIFT_CLAMP_RELEASE);
                         moveHook(HOOK_RELEASE);
+                        moveBallClamp(BALL_CLAMP_RELEASE);
                     }
 
                     else if(hookServo.getPosition() == HOOK_RELEASE)
                     {
                         moveLiftClamp(LIFT_CLAMP_IN);
                         moveHook(HOOK_IN);
+                        moveBallClamp(BALL_CLAMP_IN);
                     }
                 }
 
                 if ((gamepad2.dpad_left && !prevGamepad2.dpad_left))
                 {
-                    if(ballClampServo.getPosition() == BALL_CLAMP_IN)
+                    if(ballClampServo.getPosition() == BALL_CLAMP_IN || ballClampServo.getPosition() == BALL_CLAMP_CLAMP)
                     {
                         moveBallClamp(BALL_CLAMP_RELEASE);
                     }
 
                     else if(ballClampServo.getPosition() == BALL_CLAMP_RELEASE)
                     {
-                        moveBallClamp(BALL_CLAMP_IN);
+                        moveBallClamp(BALL_CLAMP_CLAMP);
                     }
                 }
             }

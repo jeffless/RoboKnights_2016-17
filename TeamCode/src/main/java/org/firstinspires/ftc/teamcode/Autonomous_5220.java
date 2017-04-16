@@ -843,7 +843,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-4);
+            move(-5.6);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -1119,7 +1119,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            strafe(-10);
+            strafe(-8);
             rotateEncoder(29, 0.5);
         }
 

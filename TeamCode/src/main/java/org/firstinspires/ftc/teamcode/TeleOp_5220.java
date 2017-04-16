@@ -351,6 +351,15 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                 }
             }
 
+            if(gamepad2.left_bumper)
+            {
+                shoot.mSuspend();
+                delayTimer = null;
+                moveDoor(DOOR_CLOSED);
+                moveRamp(RAMP_OPEN);
+                teleOpShootingState = SHOOTER_OFF;
+            }
+
             if (gamepad1.right_bumper || gamepad2.right_bumper)
             {
                 setSweeperPower(1.0);
@@ -400,7 +409,7 @@ public class TeleOp_5220 extends OpMode_5220 //this is a comment. It is a long c
                     }
                 }
 
-                if ((gamepad1.dpad_left && !prevGamepad1.dpad_left))
+                if ((gamepad1.dpad_left && !prevGamepad1.dpad_left) || ((gamepad1.left_trigger > 0.7) && !(prevGamepad1.left_trigger > 0.7)))
                 {
                     if(ballClampServo.getPosition() == BALL_CLAMP_IN || ballClampServo.getPosition() == BALL_CLAMP_CLAMP)
                     {

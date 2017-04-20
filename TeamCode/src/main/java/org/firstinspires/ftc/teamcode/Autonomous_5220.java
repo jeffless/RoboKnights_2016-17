@@ -495,7 +495,7 @@ public class Autonomous_5220 extends OpMode_5220
                 sleep(200);
                 rotateEncoder(5.4);
                 sleep(200);
-                move(18.7, 0.65, ENCODER);
+                move(19.5, 0.65, ENCODER);
             }
         }
 
@@ -555,6 +555,8 @@ public class Autonomous_5220 extends OpMode_5220
                 move(13.7, 0.8);
                 rotateEncoder(21, 0.7);
                 strafeTime(1000, 0.7);
+                diagonalStrafeAgainstWall(FORWARDS);
+                sleep(450);
                 stopDrivetrain();
             }
         }
@@ -711,7 +713,7 @@ public class Autonomous_5220 extends OpMode_5220
             if(color == RED)
             {
                 findButton(BACKWARDS);
-                //move(0.5, 0.8);
+                move(0.2, 0.8);
             }
         }
 
@@ -726,7 +728,7 @@ public class Autonomous_5220 extends OpMode_5220
             if(color == RED)
             {
                 findButton(BACKWARDS);
-               //move(0.2, 0.8);
+                move(0.2, 0.8);
             }
         }
 
@@ -892,7 +894,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         else if (color == RED)
         {
-            move (-2);
+            move (-7);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -914,7 +916,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         if(color == RED)
         {
-            move(6.3);
+            move(7.2);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
             stopDrivetrain();

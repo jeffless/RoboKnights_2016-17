@@ -357,14 +357,14 @@ public class Autonomous_5220 extends OpMode_5220
                 setMotorPower(leftFrontMotor, 0.8);
                 setMotorPower(rightBackMotor, 0.8);
 
-                setMotorPower(leftBackMotor, 0.1);
-                setMotorPower(rightFrontMotor, 0.1);
+                setMotorPower(leftBackMotor, 0.2);
+                setMotorPower(rightFrontMotor, 0.2);
             }
 
             else if (direction == BACKWARDS)
             {
-                setMotorPower(leftFrontMotor, -0.1);
-                setMotorPower(rightBackMotor, -0.1);
+                setMotorPower(leftFrontMotor, -0.2);
+                setMotorPower(rightBackMotor, -0.2);
 
                 setMotorPower(leftBackMotor, -0.8);
                 setMotorPower(rightFrontMotor, -0.8);
@@ -482,11 +482,11 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if(color == BLUE)
             {
-                move(-5, 0.64, ENCODER);
+                move(-3, 0.64, ENCODER);
                 sleep(200);
                 rotateEncoder(-8.4);
                 sleep(200);
-                move(-18.9, 0.64, ENCODER);
+                move(-16.5, 0.68, ENCODER);
             }
 
             else if(color == RED)
@@ -540,9 +540,9 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (color == BLUE)
             {
-                move (-11.3, 0.8);
+                move (-13.3, 0.8);
                 rotateEncoder(-28.4, 0.8);
-                move(2.5);
+                move(4.0);
                 strafeTime(1000, 0.7);
                 diagonalStrafeAgainstWall(BACKWARDS);
                 sleep (450);
@@ -644,12 +644,43 @@ public class Autonomous_5220 extends OpMode_5220
 
         if (color == RED)
         {
-            diagonalStrafeAgainstWall(direction);
-            while (runConditions() && colorSensorFront.red() < 2) ;
+            while(runConditions())
+            {
+                diagonalStrafeAgainstWall(direction);
+
+                if (colorSensorFront.red() >= 1 && colorSensorFront.green() < 2)
+                {
+                    break;
+                }
+            }
             stopDrivetrain();
         }
 
         else if (color == BLUE) //ADD PROTECTION BY CHECKING OPPOSITE COLOR ISN'T DETECTED?
+        {
+            while(runConditions())
+            {
+                diagonalStrafeAgainstWall(direction);
+
+                if (colorSensorFront.blue() >= 3 && colorSensorFront.green() < 2)
+                {
+                    break;
+                }
+            }
+            stopDrivetrain();
+        }
+    }
+
+    private void findButtonLine(boolean direction)
+    {
+        if(color == RED)
+        {
+            diagonalStrafeAgainstWall(direction);
+            while(runConditions())
+            stopDrivetrain();
+        }
+
+        else if (color == BLUE)
         {
             diagonalStrafeAgainstWall(direction);
             while (runConditions() && colorSensorFront.blue() < 3) ;
@@ -674,7 +705,7 @@ public class Autonomous_5220 extends OpMode_5220
             if(color == BLUE)
             {
                 findButton(FORWARDS);
-                move(1.0, 0.8);
+                move(-0.24, 0.3);
             }
 
             if(color == RED)
@@ -720,6 +751,8 @@ public class Autonomous_5220 extends OpMode_5220
         if(startPosition == START_NORMAL || startPosition == START_FAR) move ((color == BLUE ? 20: -23), 0.9, ENCODER);
         else if(startPosition == START_AIM) move((color == BLUE ? -26: 23), 0.9, ENCODER);
 
+        strafeTime(460, 0.8);
+
         //findButton();
 
         if(startPosition == START_NORMAL || startPosition == START_FAR)
@@ -727,7 +760,7 @@ public class Autonomous_5220 extends OpMode_5220
             if(color == BLUE)
             {
                 findButton(FORWARDS);
-                move(1.0, 0.8);
+                //move(1.0, 0.8);
             }
 
             if(color == RED)
@@ -776,11 +809,81 @@ public class Autonomous_5220 extends OpMode_5220
         sleep(200);
     }
 
+    private void alignPushButtonsAlongWall()
+    {
+        if(startPosition == START_NORMAL)
+        {
+            if(color == BLUE)
+            {
+                findButton(FORWARDS);
+                move(1.0, 0.8);
+            }
+
+            if(color == RED)
+            {
+                findButton(BACKWARDS);
+                //move(0.5, 0.8);
+            }
+        }
+
+        else if(startPosition == START_AIM)
+        {
+            if(color == BLUE)
+            {
+                findButton(FORWARDS);
+                move(0.8, 0.8);
+            }
+
+            if(color == RED)
+            {
+                findButton(BACKWARDS);
+            }
+        }
+
+        pushButton();
+        sleep(720);
+        if(startPosition == START_NORMAL || startPosition == START_FAR) move ((color == BLUE ? 20: -23), 0.9, ENCODER);
+        else if(startPosition == START_AIM) move((color == BLUE ? -26: 23), 0.9, ENCODER);
+
+        if(startPosition == START_NORMAL || startPosition == START_FAR)
+        {
+            if(color == BLUE)
+            {
+                findButton(FORWARDS);
+                move(1.0, 0.8);
+            }
+
+            if(color == RED)
+            {
+                findButton(BACKWARDS);
+                move(0.2, 0.8);
+            }
+        }
+
+        else if(startPosition == START_AIM)
+        {
+            if(color == BLUE)
+            {
+                findButton(BACKWARDS);
+                move(0.5, 0.8);
+            }
+
+            if(color == RED)
+            {
+                findButton(FORWARDS);
+                move(0.2, 0.8);
+            }
+        }
+
+        pushButton();
+        sleep(200);
+    }
+
     private void alignWithFarLine()
     {
         if (color == BLUE)
         {
-            move(7);
+            move(8.7);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -823,8 +926,8 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            strafe(-5);
-            rotateEncoder(-6.3);
+            strafe(-4);
+            rotateEncoder(-6);
             move(-50);
         }
 

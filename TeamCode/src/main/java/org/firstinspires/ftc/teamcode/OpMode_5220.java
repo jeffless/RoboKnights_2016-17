@@ -119,7 +119,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     protected static final double HOOK_ADJUST_RELEASE_TIME = 2.0;
     protected static final double HOOK_ADJUST_RELEASE_DISTANCE = 0.7;
 
-    protected static final double LINE_WHITE_THRESHOLD = 28;
+    protected static final double LINE_WHITE_THRESHOLD = 21;
 
     protected static final double DOOR_OPEN = 0.5;
     protected static final double DOOR_INIT = 1.0;
@@ -283,7 +283,7 @@ public abstract class OpMode_5220 extends LinearOpMode
         colorSensorDown = hardwareMap.colorSensor.get("cSensorD");
         colorSensorFront = hardwareMap.colorSensor.get("cSensorF");
         colorSensorAlt = hardwareMap.colorSensor.get("cSensorA");
-        colorSensorDown.setI2cAddress(I2cAddr.create8bit(0x3E));//IF 7 BIT DOESN'T WORK TRY 8 BIT ADDRESS (I2cAddr.create8bit(0x3E)), OR USING I2CADDR CONSTRUCTOR
+        colorSensorDown.setI2cAddress(I2cAddr.create8bit(0x42));//IF 7 BIT DOESN'T WORK TRY 8 BIT ADDRESS (I2cAddr.create8bit(0x3E)), OR USING I2CADDR CONSTRUCTOR
         // in hex, 0x3e = 62. deault address is 60 (reserved for colorSensorDown)
         colorSensorAlt.setI2cAddress(I2cAddr.create8bit(0x34));
         colorSensorFront.enableLed(false);

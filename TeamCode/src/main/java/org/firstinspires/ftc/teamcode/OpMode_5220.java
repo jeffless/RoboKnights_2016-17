@@ -497,7 +497,7 @@ public abstract class OpMode_5220 extends LinearOpMode
 
         try
         {
-            waitOneFullHardwareCycle();
+            //waitOneFullHardwareCycle();
         }
         catch (Exception e)
         {
@@ -509,7 +509,7 @@ public abstract class OpMode_5220 extends LinearOpMode
     {
         try
         {
-            waitForNextHardwareCycle();
+            //waitForNextHardwareCycle();
         }
         catch (Exception e)
         {

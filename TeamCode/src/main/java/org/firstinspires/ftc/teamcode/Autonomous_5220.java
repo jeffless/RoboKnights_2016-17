@@ -277,7 +277,7 @@ public class Autonomous_5220 extends OpMode_5220
             switch (s)
             {
                 case START_NORMAL: return "NORMAL";
-                case START_FAR: return "FAR (away from corner vortex)";
+                case START_FAR: return "FAR (Away From Corner Vortex)";
                 case START_AIM: return "AIM (Far Beacon First)";
                 default: return "Error: Start Position Number.";
             }
@@ -397,48 +397,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         while (runConditions() && getFloorBrightness() < LINE_WHITE_THRESHOLD)
         {
-
-        }
-    }
-
-    private void safeWaitForLine() //NEED TO TEST
-    {
-        double firstColor = DETECT_NONE;
-        boolean detectBoth = false;
-
-        while(runConditions() && getFloorBrightness() < LINE_WHITE_THRESHOLD)
-        {
-            if(colorSensorFront.blue() >= 3)
-            {
-                firstColor = DETECT_BLUE;
-            }
-
-            else if(colorSensorFront.red() >= 2)
-            {
-                firstColor = DETECT_RED;
-            }
-
-            sleep(800);
-
-            if(firstColor == DETECT_RED && colorSensorFront.red() >= 3)
-            {
-                detectBoth = true;
-            }
-
-            else if(firstColor == DETECT_BLUE && colorSensorFront.blue() >= 2)
-            {
-                detectBoth = true;
-            }
-
-            if(detectBoth)
-            {
-                int beginning = gameTimer.time();
-
-                if(gameTimer.time() > beginning + overLineTime)
-                {
-                    moveBackToLine();
-                }
-            }
+            idle();
         }
     }
 
@@ -843,7 +802,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if(color == BLUE)
         {
-            move(-5.6);
+            move(-7.2);
             diagonalStrafeAgainstWall(FORWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -852,7 +811,7 @@ public class Autonomous_5220 extends OpMode_5220
 
         if(color == RED)
         {
-            move(7);
+            move(6.3);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -961,7 +920,7 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(20.5, 0.6); */
             move(13.2, 0.82, ENCODER);
             sleep(350);
-            rotateEncoder(21, 0.7);
+            rotateEncoder(22, 0.7);
             //move (1, 0.6);
         }
     }
@@ -1155,7 +1114,7 @@ public class Autonomous_5220 extends OpMode_5220
         else if(color ==  RED)
         {
             rotateEncoder(5);
-            strafe(13);
+            strafe(12);
             move(-26);
         }
     }

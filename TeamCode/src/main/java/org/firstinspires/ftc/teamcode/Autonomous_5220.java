@@ -354,6 +354,7 @@ public class Autonomous_5220 extends OpMode_5220
         {
             if (direction == FORWARDS)
             {
+
                 setMotorPower(leftFrontMotor, 0.8);
                 setMotorPower(rightBackMotor, 0.8);
 
@@ -363,10 +364,18 @@ public class Autonomous_5220 extends OpMode_5220
 
             else if (direction == BACKWARDS)
             {
+                /*
                 setMotorPower(leftFrontMotor, -0.2);
                 setMotorPower(rightBackMotor, -0.2);
 
                 setMotorPower(leftBackMotor, -0.8);
+                setMotorPower(rightFrontMotor, -0.8);
+                */
+
+                setMotorPower(leftFrontMotor, -0.15);
+                setMotorPower(rightBackMotor, -0.15);
+
+                setMotorPower(leftBackMotor, -0.95);
                 setMotorPower(rightFrontMotor, -0.8);
             }
         }
@@ -1023,9 +1032,9 @@ public class Autonomous_5220 extends OpMode_5220
         {
             /*move(11, 0.6);
             rotateEncoder(20.5, 0.6); */
-            move(13.2, 0.82, ENCODER);
+            move(12.3, 0.82, ENCODER);
             sleep(350);
-            rotateEncoder(22, 0.7);
+            rotateEncoder(23.5, 0.7);
             //move (1, 0.6);
         }
     }

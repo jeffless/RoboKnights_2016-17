@@ -894,7 +894,7 @@ public class Autonomous_5220 extends OpMode_5220
     {
         if (color == BLUE)
         {
-            move(8.7);
+            move(9.5);
             diagonalStrafeAgainstWall(BACKWARDS, SLOW);
             waitForLine();
             stopDrivetrain();
@@ -1034,7 +1034,7 @@ public class Autonomous_5220 extends OpMode_5220
             rotateEncoder(20.5, 0.6); */
             move(12.3, 0.82, ENCODER);
             sleep(350);
-            rotateEncoder(23.5, 0.7);
+            rotateEncoder(22.3, 0.7);
             //move (1, 0.6);
         }
     }
